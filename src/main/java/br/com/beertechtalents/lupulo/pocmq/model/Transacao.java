@@ -1,7 +1,8 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Transacao {
 
     @Id
@@ -21,8 +23,7 @@ public class Transacao {
 
     private BigDecimal valor;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false, insertable = false)
+    @CreatedDate
     private Timestamp datahora;
 
 }
