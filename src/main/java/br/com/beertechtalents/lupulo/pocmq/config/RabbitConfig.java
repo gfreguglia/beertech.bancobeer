@@ -34,7 +34,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding inboundEmailExchangeBinding() {
+    public Binding inboundOperationExchangeBinding() {
         return BindingBuilder.bind(inboundOperationQueue()).to(operationExchange()).with("*");
     }
 
