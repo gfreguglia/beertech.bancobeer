@@ -22,7 +22,7 @@ public class Transacao {
     @Enumerated(EnumType.STRING)
     private TipoTransacao tipo;
 
-    @Column(length = 15, precision = 2, nullable = false)
+    @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal valor;
 
     @CreatedDate
