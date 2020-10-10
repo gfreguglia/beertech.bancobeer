@@ -3,24 +3,19 @@ package br.com.beertechtalents.lupulo.pocmq.controller;
 
 import br.com.beertechtalents.lupulo.pocmq.model.Transacao;
 import br.com.beertechtalents.lupulo.pocmq.service.TransacaoService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/transacao")
+@Api(value = "Endpoints para transações")
 @RequiredArgsConstructor
-public class TrasacaoController {
+public class TransacaoController {
 
     final TransacaoService transacaoService;
 
@@ -28,9 +23,7 @@ public class TrasacaoController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "successful operation", response = BigDecimal.class),
             @ApiResponse(code = 400, message = "Invalid status value") })
-    @RequestMapping(
-            produces = { "application/json" },
-            method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<BigDecimal> getSaldo(){
         return new ResponseEntity<>(transacaoService.buscarSaldo(), HttpStatus.OK);
     }
@@ -38,10 +31,7 @@ public class TrasacaoController {
     @ApiOperation(value = "Adiciona uma nova transacao", nickname = "POST", notes = "", tags={ "transacao", })
     @ApiResponses(value = {
             @ApiResponse(code = 405, message = "Invalid input") })
-    @RequestMapping(value = "",
-            produces = { "application/json" },
-            consumes = { "application/json" },
-            method = RequestMethod.POST)
+    @PostMapping
     public void novaOperacao(@ApiParam(value = "Tool object that needs to be added" ,required=true )  @RequestBody Transacao body){
         transacaoService.salvarTransacao(body);
     }
