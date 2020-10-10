@@ -1,7 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
-import lombok.NonNull;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
