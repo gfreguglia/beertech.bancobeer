@@ -1,7 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
 
-import br.com.beertechtalents.lupulo.pocmq.model.TipoTransacao;
 import br.com.beertechtalents.lupulo.pocmq.model.Transacao;
 import br.com.beertechtalents.lupulo.pocmq.service.TransacaoService;
 import io.swagger.annotations.*;
@@ -23,7 +22,7 @@ public class TransacaoController {
 
     final TransacaoService transacaoService;
 
-    @ApiOperation(value = "Busca saldo total", nickname = "GET", notes = "Busca o saldo total", response = BigDecimal.class, tags = {"tool",})
+    @ApiOperation(value = "Busca saldo total", nickname = "GET", response = BigDecimal.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "successful operation", response = BigDecimal.class),
             @ApiResponse(code = 400, message = "Invalid status value")})
@@ -32,14 +31,14 @@ public class TransacaoController {
         return new ResponseEntity<>(transacaoService.buscarSaldo(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Adiciona uma nova transacao", nickname = "POST", notes = "", tags = {"transacao",})
+    @ApiOperation(value = "Adiciona uma nova transacao", nickname = "POST")
     @ApiResponses(value = {
             @ApiResponse(code = 405, message = "Invalid input")})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public void novaOperacao(@ApiParam(value = "Tool object that needs to be added", required = true) @RequestBody Transacao body) {
+    public void novaOperacao(@RequestBody Transacao body) {
 
         // Normalizar entrada
-        if(body.getTipo().equals(TipoTransacao.SAQUE)) {
+        if(body.getTipo().equals(Transacao.TipoTransacao.SAQUE)) {
             body.setValor(body.getValor().abs().negate());
         } else {
             body.setValor(body.getValor().abs());
