@@ -1,19 +1,20 @@
 version: '3.7'
 
 services:
-  poc-mq:
-    image: poc-mq:latest
-    restart: on-failure
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - 8080:8080
-    networks:
-      - backend
+#  poc-mq:
+#    image: poc-mq:latest
+#    restart: on-failure
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+#    ports:
+#      - 8080:8080
+#    networks:
+#      - backend
   rabbitmq:
     image: rabbitmq:3.5-management
     restart: on-failure
     ports:
+      - 5672:5672
       - 15672:15672
     networks:
       - backend
@@ -25,6 +26,8 @@ services:
       MYSQL_USER: poc
       MYSQL_PASSWORD: poc
       MYSQL_DATABASE: lupulo_db
+    ports:
+      - 3306:3306
     networks:
       - backend
 
