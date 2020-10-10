@@ -1,7 +1,12 @@
 version: '3.1'
 
 services:
-
+  rabbitmq:
+    image: rabbitmq:3.5-management
+    container_name: lupulo-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   db:
     image: mysql
     restart: always
