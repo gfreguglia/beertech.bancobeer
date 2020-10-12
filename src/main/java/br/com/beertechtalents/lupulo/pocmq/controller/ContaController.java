@@ -1,8 +1,8 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContasDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
-import br.com.beertechtalents.lupulo.pocmq.model.Transacao;
+import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,12 +16,9 @@ import org.springframework.web.context.request.async.DeferredResult;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/conta")
@@ -32,25 +29,27 @@ public class ContaController {
     ContaService contaService;
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Page<ConsultaContasDTO>> getContas(@RequestParam(defaultValue = "0", required = false) @Min(0) int page,
-                                                             @RequestParam(defaultValue = "10", required = false) @Min(10) @Max(50) int size) {
-        Page<ConsultaContasDTO> map = contaService.getPageConta(page, size)
-                .map(conta -> new ConsultaContasDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm()));
+    public ResponseEntity<Page<ConsultaContaDTO>> getContas(@RequestParam(defaultValue = "0", required = false) @Min(0) int page,
+                                                            @RequestParam(defaultValue = "10", required = false) @Min(10) @Max(50) int size) {
+        Page<ConsultaContaDTO> map = contaService.getPageConta(page, size)
+                .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm()));
 
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<Conta> getConta(@PathVariable UUID uuid) {
+    public ResponseEntity<ConsultaContaDTO> getConta(@PathVariable UUID uuid) {
         Optional<Conta> optionalConta = contaService.getConta(uuid);
         if (optionalConta.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(optionalConta.get());
+        Conta conta = optionalConta.get();
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm());
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{uuid}/saldo")
-    public DeferredResult<ResponseEntity<BigDecimal>> getSaldoConta(@PathVariable UUID uuid) throws ExecutionException, InterruptedException {
+    public DeferredResult<ResponseEntity<BigDecimal>> getSaldoConta(@PathVariable UUID uuid) {
 
         DeferredResult<ResponseEntity<BigDecimal>> output = new DeferredResult<>();
 
@@ -62,10 +61,10 @@ public class ContaController {
 
         ForkJoinPool.commonPool().submit(() -> {
             Conta conta = optionalConta.get();
-            BigDecimal reduce = Stream.of(conta.getEntradas(), conta.getSaidas())
-                    .flatMap(Collection::stream)
-                    .map(Transacao::getValor)
-                    .reduce(new BigDecimal(0.0), BigDecimal::add);
+            BigDecimal reduce = conta.getOperacoes()
+                    .stream()
+                    .map(Operacao::getValor)
+                    .reduce(BigDecimal.valueOf(0.0), BigDecimal::add);
 
             output.setResult(ResponseEntity.ok(reduce));
         });

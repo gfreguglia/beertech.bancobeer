@@ -1,18 +1,15 @@
 package br.com.beertechtalents.lupulo.pocmq.controller.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@AllArgsConstructor
 @Getter
-public class ConsultaContaDTO extends ConsultaContasDTO {
-    public ConsultaContaDTO(UUID uuid, String nome, Timestamp criadoEm, BigDecimal saldo) {
-        super(uuid, nome, criadoEm);
-        this.saldo = saldo;
-    }
-
-    BigDecimal saldo;
-
+public class ConsultaContaDTO {
+    final UUID uuid;
+    final String nome;
+    final Timestamp criadoEm;
 }
