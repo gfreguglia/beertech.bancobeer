@@ -1,5 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaTransferenciaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
@@ -12,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
@@ -67,12 +67,18 @@ class TransferenciaControllerTest {
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost")
                 .port(port)
-                .path("/transferencia")
-                .queryParam("origem", conta1.getUuid())
-                .queryParam("destino", conta2.getUuid())
-                .queryParam("valor", 100);
+                .path("/transferencia");
 
-        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, null, String.class);
+        NovaTransferenciaDTO dto = new NovaTransferenciaDTO();
+        dto.setOrigem(conta1.getUuid());
+        dto.setDestino(conta2.getUuid());
+        dto.setValor(new BigDecimal("50.00"));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity entity = new HttpEntity(dto, httpHeaders);
+
+        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
         assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
     }
 
