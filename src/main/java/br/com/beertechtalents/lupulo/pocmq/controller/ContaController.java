@@ -4,7 +4,9 @@ import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -52,7 +54,7 @@ public class ContaController {
     }
 
     @ApiOperation(value = "Consulta saldo", response = ConsultaSaldoDTO.class)
-    @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.TEXT_PLAIN_VALUE})
+    @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.APPLICATION_JSON_VALUE})
     public CompletableFuture<ResponseEntity<ConsultaSaldoDTO>> getSaldoConta(@PathVariable UUID uuid) {
         Optional<Conta> conta = contaService.getConta(uuid);
         if (conta.isEmpty()) {
