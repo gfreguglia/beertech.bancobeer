@@ -5,8 +5,6 @@ import br.com.beertechtalents.lupulo.pocmq.repository.OperacaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-
 @Service
 @RequiredArgsConstructor
 public class OperacaoService {
