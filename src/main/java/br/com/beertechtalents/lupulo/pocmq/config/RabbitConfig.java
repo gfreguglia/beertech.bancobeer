@@ -1,8 +1,9 @@
 package br.com.beertechtalents.lupulo.pocmq.config;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.OperacaoController;
 import br.com.beertechtalents.lupulo.pocmq.controller.TransferenciaController;
-import br.com.beertechtalents.lupulo.pocmq.rest.TransacaoAdapter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaOperacaoDTO;
+import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -23,8 +25,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RabbitConfig {
 
-    TransacaoAdapter transacaoAdapter;
     TransferenciaController transferenciaController;
+    OperacaoController operacaoController;
 
     @Bean
     public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
@@ -57,8 +59,16 @@ public class RabbitConfig {
     }
 
     @RabbitListener(queues = {"operation_inbound"})
-    public void receive(final String msg) {
-        transacaoAdapter.call(msg);
+    public void receive(final String msg) throws ParseException {
+        JSONParser parser = new JSONParser(msg);
+        LinkedHashMap<String, Object> obj = parser.parseObject();
+
+        NovaOperacaoDTO novaOperacaoDTO = new NovaOperacaoDTO();
+        novaOperacaoDTO.setConta(UUID.fromString((String) obj.get("conta")));
+        novaOperacaoDTO.setTipo(Operacao.TipoTransacao.valueOf((String) obj.get("tipo")));
+        novaOperacaoDTO.setValor((BigDecimal) obj.get("valor"));
+
+        operacaoController.novaOperacao(novaOperacaoDTO);
     }
 
     @RabbitListener(queues = {"transfer_inbound"})

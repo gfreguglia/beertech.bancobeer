@@ -2,7 +2,6 @@ package br.com.beertechtalents.lupulo.pocmq.controller;
 
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
-import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,14 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/conta")
@@ -49,27 +47,12 @@ public class ContaController {
     }
 
     @GetMapping("/{uuid}/saldo")
-    public DeferredResult<ResponseEntity<BigDecimal>> getSaldoConta(@PathVariable UUID uuid) {
-
-        DeferredResult<ResponseEntity<BigDecimal>> output = new DeferredResult<>();
-
-        Optional<Conta> optionalConta = contaService.getConta(uuid);
-        if (optionalConta.isEmpty()) {
-            output.setResult(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-            return output;
+    public CompletableFuture<ResponseEntity<BigDecimal>> getSaldoConta(@PathVariable UUID uuid) {
+        Optional<Conta> conta = contaService.getConta(uuid);
+        if (conta.isEmpty()) {
+            return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }
-
-        ForkJoinPool.commonPool().submit(() -> {
-            Conta conta = optionalConta.get();
-            BigDecimal reduce = conta.getOperacoes()
-                    .stream()
-                    .map(operacao -> operacao.getTipo().equals(Operacao.TipoTransacao.SAQUE) ? operacao.getValor().negate() : operacao.getValor())
-                    .reduce(BigDecimal.valueOf(0.0), BigDecimal::add);
-
-            output.setResult(ResponseEntity.ok(reduce));
-        });
-
-        return output;
+        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(this.contaService.computeSaldo(conta.get())));
     }
 
     @PostMapping(consumes = {MediaType.TEXT_PLAIN_VALUE})

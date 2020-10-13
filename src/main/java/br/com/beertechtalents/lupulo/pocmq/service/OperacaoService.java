@@ -16,9 +16,4 @@ public class OperacaoService {
     public void salvarOperacao(Operacao operacao) {
         operacaoRepository.save(operacao);
     }
-
-    public BigDecimal buscarSaldo() {
-        return operacaoRepository.somaSaldo();
-    }
-
 }

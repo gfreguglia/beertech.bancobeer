@@ -20,13 +20,11 @@ public class TransferenciaService {
     OperacaoService operacaoService;
 
     @Transactional
-    public void transferir(UUID origem, UUID destino, BigDecimal valor) {
+    public void transferir(UUID origem, UUID destino, BigDecimal valor) throws HttpClientErrorException {
         Optional<Conta> optionalContaOrigem = contaService.getConta(origem);
         if(optionalContaOrigem.isEmpty()) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta origem não encontrada.");
         }
-
-        // TODO: Validar saldo
 
         Operacao op = new Operacao();
         op.setValor(valor);

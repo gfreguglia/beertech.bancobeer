@@ -2,6 +2,7 @@ package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -11,20 +12,21 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
-@Data
+@Getter
 @EntityListeners(AuditingEntityListener.class)
 public class Operacao implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
     private Long id;
 
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private TipoTransacao tipo;
 
     @Column(precision = 15, scale = 2, nullable = false)
+    @Setter
     private BigDecimal valor;
 
     @ManyToOne
@@ -33,10 +35,10 @@ public class Operacao implements Serializable {
             referencedColumnName = "uuid",
             columnDefinition = "BINARY(16)"
     )
+    @Setter
     private Conta conta;
 
     @CreatedDate
-    @Getter
     private Timestamp datahora;
 
     public enum TipoTransacao {

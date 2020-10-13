@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
@@ -26,7 +27,11 @@ public class TransferenciaController {
                                                @RequestParam UUID destino,
                                                @RequestParam @Min(0) BigDecimal valor) {
 
-        transferenciaService.transferir(origem, destino, valor);
+        try {
+            transferenciaService.transferir(origem, destino, valor);
+        } catch (HttpClientErrorException ex) {
+            return new ResponseEntity<>(ex.getLocalizedMessage(), ex.getStatusCode());
+        }
 
         return ResponseEntity.noContent().build();
     }

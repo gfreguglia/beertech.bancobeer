@@ -1,53 +1,42 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
-import br.com.beertechtalents.lupulo.pocmq.repository.OperacaoRepository;
-import org.junit.jupiter.api.Assertions;
+import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 
-@ExtendWith(MockitoExtension.class)
-public class OperacaoServiceTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    @InjectMocks
-    private OperacaoService operacaoService;
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OperacaoServiceTest {
 
-    @Mock
-    private OperacaoRepository operacaoRepository;
+    @Autowired
+    ContaRepository contaRepository;
 
-    @Test
-    public void saveTest() {
-        Operacao operacao = new Operacao();
-        operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
-        operacao.setValor(BigDecimal.TEN);
+    @Autowired
+    OperacaoService operacaoService;
 
+    Conta conta = new Conta();
 
-        Mockito.when(operacaoRepository.save(Mockito.any(Operacao.class))).then(i -> {
-            Operacao t = (Operacao) i.getArguments()[0];
-            t.setId(1L);
-            t.setDatahora(new Timestamp(10000L));
-            return t;
-        });
-
-        operacaoService.salvarOperacao(operacao);
+    @BeforeAll
+    void setUp() {
+        conta.setNome("CONTA");
+        conta = contaRepository.save(conta);
     }
 
-
     @Test
-    public void buscarSaldoTest() {
-
-        Mockito.when(operacaoRepository.somaSaldo()).then(i -> BigDecimal.TEN);
-
-        BigDecimal saldo = operacaoService.buscarSaldo();
-
-        Assertions.assertEquals(BigDecimal.TEN, saldo);
+    void salvarOperacao() {
+        Operacao op = new Operacao();
+        op.setValor(BigDecimal.valueOf(10.0));
+        op.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        op.setConta(conta);
+        operacaoService.salvarOperacao(op);
     }
-
 }
