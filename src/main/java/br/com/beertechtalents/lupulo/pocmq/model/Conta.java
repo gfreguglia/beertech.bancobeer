@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class Conta implements Serializable {
 
     // Length deve ser 16 pois o default do hibernate é 255 e o UUID usa 16
     @NaturalId
-    @Column(unique = true, length = 16)
+    @Column(unique = true, columnDefinition = "BINARY(16)")
     UUID uuid = UUID.randomUUID();
 
     @CreatedDate

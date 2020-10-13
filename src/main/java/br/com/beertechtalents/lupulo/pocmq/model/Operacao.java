@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -30,7 +31,8 @@ public class Operacao implements Serializable {
     @ManyToOne
     @JoinColumn(
             name = "conta_uuid",
-            referencedColumnName = "uuid"
+            referencedColumnName = "uuid",
+            columnDefinition = "BINARY(16)"
     )
     private Conta conta;
 
