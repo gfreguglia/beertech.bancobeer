@@ -32,7 +32,7 @@ public class OperacaoController {
     OperacaoService operacaoService;
     ContaService contaService;
 
-    @ApiOperation(value = "Adiciona uma nova transacao", nickname = "POST")
+    @ApiOperation(value = "Adiciona uma nova operacao", nickname = "POST")
     @ApiResponses(value = {
             @ApiResponse(code = 405, message = "Invalid input")})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})

@@ -1,8 +1,10 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,19 +24,22 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/conta")
 @AllArgsConstructor
 @Validated
+@Api("Endpoints para gerenciamento de contas")
 public class ContaController {
 
     ContaService contaService;
 
+    @ApiOperation("Consulta paginada de contas")
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Page<ConsultaContaDTO>> getContas(@RequestParam(defaultValue = "0", required = false) @Min(0) int page,
-                                                            @RequestParam(defaultValue = "10", required = false) @Min(10) @Max(50) int size) {
+    public ResponseEntity<Page<ConsultaContaDTO>> getContas(@ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
+                                                            @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size) {
         Page<ConsultaContaDTO> map = contaService.getPageConta(page, size)
                 .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm()));
 
         return ResponseEntity.ok(map);
     }
 
+    @ApiOperation("Consulta de conta")
     @GetMapping("/{uuid}")
     public ResponseEntity<ConsultaContaDTO> getConta(@PathVariable UUID uuid) {
         Optional<Conta> optionalConta = contaService.getConta(uuid);
@@ -46,15 +51,23 @@ public class ContaController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{uuid}/saldo")
-    public CompletableFuture<ResponseEntity<BigDecimal>> getSaldoConta(@PathVariable UUID uuid) {
+    @ApiOperation(value = "Consulta saldo", response = ConsultaSaldoDTO.class)
+    @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.TEXT_PLAIN_VALUE})
+    public CompletableFuture<ResponseEntity<ConsultaSaldoDTO>> getSaldoConta(@PathVariable UUID uuid) {
         Optional<Conta> conta = contaService.getConta(uuid);
         if (conta.isEmpty()) {
             return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }
-        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(this.contaService.computeSaldo(conta.get())));
+        return CompletableFuture.supplyAsync(() -> {
+            BigDecimal bigDecimal = this.contaService.computeSaldo(conta.get());
+            ConsultaSaldoDTO dto = new ConsultaSaldoDTO();
+            dto.setSaldo(bigDecimal);
+            dto.setUuid(conta.get().getUuid());
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        });
     }
 
+    @ApiOperation("Criar nova conta")
     @PostMapping(consumes = {MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<UUID> postConta(@RequestBody String nome) {
         Conta conta = new Conta();
