@@ -18,7 +18,7 @@ import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ForkJoinPool;
 
 @RestController
 @RequestMapping("/conta")
@@ -63,7 +63,7 @@ public class ContaController {
             Conta conta = optionalConta.get();
             BigDecimal reduce = conta.getOperacoes()
                     .stream()
-                    .map(Operacao::getValor)
+                    .map(operacao -> operacao.getTipo().equals(Operacao.TipoTransacao.SAQUE) ? operacao.getValor().negate() : operacao.getValor())
                     .reduce(BigDecimal.valueOf(0.0), BigDecimal::add);
 
             output.setResult(ResponseEntity.ok(reduce));
