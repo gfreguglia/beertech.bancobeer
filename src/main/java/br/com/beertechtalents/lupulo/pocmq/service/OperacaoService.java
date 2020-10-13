@@ -13,11 +13,11 @@ public class OperacaoService {
 
     final OperacaoRepository operacaoRepository;
 
-    public void salvarOperacao(Operacao operacao){
+    public void salvarOperacao(Operacao operacao) {
         operacaoRepository.save(operacao);
     }
 
-    public BigDecimal buscarSaldo(){
+    public BigDecimal buscarSaldo() {
         return operacaoRepository.somaSaldo();
     }
 

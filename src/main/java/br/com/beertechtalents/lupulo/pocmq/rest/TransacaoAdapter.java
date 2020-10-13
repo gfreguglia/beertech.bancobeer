@@ -18,7 +18,7 @@ public class TransacaoAdapter {
         header.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         HttpEntity<String> resquestBody = new HttpEntity(body, header);
 
-        restTemplate.postForObject("http://localhost:8080/transacao", resquestBody, String.class);
+        restTemplate.postForObject("http://localhost:8080/operacao", resquestBody, String.class);
 
     }
 }
