@@ -1,16 +1,16 @@
 # Legacy POC - Lúpulo
 
-## Para subir o banco de dados:
-Abra um terminal em **src/main/resources/sql**
+- API http://127.0.0.1:8080
+- RabbitMQ http://127.0.0.1:15672
 
-`docker-compose up`
+## Para subir o ambiente completo:
+Abra um terminal na raiz do projeto e execute
 
-Em um novo terminal: 
+`./gradlew build docker`
 
-`docker exec -it sql_db_1 bash`
+`docker-compose up -d`
 
-`mysql -uroot -proot`
+## Para subir o ambiente desenvolvimento:
+`docker-compose up -d rabbitmq`
 
-`use lupulo_db;`
 
-Copie e cole o conteúdo de **src/main/resources/sql/create-tables.sql**  
