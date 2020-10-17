@@ -36,4 +36,8 @@ public class ContaService {
                 .map(operacao -> operacao.getTipo().equals(Operacao.TipoTransacao.SAQUE) ? operacao.getValor().negate() : operacao.getValor())
                 .reduce(BigDecimal.valueOf(0.0), BigDecimal::add);
     }
+
+    public Optional<Conta> findByEmail(String email) {
+        return contaRepository.findByEmail(email);
+    }
 }
