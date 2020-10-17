@@ -41,7 +41,7 @@ public class JwtAuthenticationController {
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(getUserDetails(authenticationRequest.getUsername(), token));
+        return ResponseEntity.ok(getUserDetails(token, authenticationRequest.getUsername()));
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -54,7 +54,7 @@ public class JwtAuthenticationController {
         }
     }
 
-    private DadosUsuarioSessaoDTO getUserDetails(String username, String token){
+    private DadosUsuarioSessaoDTO getUserDetails(String token, String username){
         Optional<Conta> conta = contaService.findByEmail(username);
 
         if (conta.isEmpty()) {
