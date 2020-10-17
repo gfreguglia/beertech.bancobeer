@@ -5,12 +5,15 @@ import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +53,13 @@ public class Conta implements Serializable {
 
     @OneToMany(mappedBy = "conta")
     List<Operacao> operacoes = new ArrayList<>();
+
+    public Collection<? extends GrantedAuthority> getAuthorities(){
+        GrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(perfil.toString());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(simpleGrantedAuthority);
+        return authorities;
+    }
 
     public enum PerfilUsuario {
         ADMIN,
