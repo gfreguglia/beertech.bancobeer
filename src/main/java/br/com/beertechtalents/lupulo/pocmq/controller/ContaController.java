@@ -2,6 +2,7 @@ package br.com.beertechtalents.lupulo.pocmq.controller;
 
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import io.swagger.annotations.Api;
@@ -36,7 +37,7 @@ public class ContaController {
     public ResponseEntity<Page<ConsultaContaDTO>> getContas(@ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
                                                             @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size) {
         Page<ConsultaContaDTO> map = contaService.getPageConta(page, size)
-                .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm()));
+                .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj()));
 
         return ResponseEntity.ok(map);
     }
@@ -49,7 +50,7 @@ public class ContaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm());
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
         return ResponseEntity.ok(dto);
     }
 
@@ -70,10 +71,14 @@ public class ContaController {
     }
 
     @ApiOperation("Criar nova conta")
-    @PostMapping(consumes = {MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<UUID> postConta(@RequestBody String nome) {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UUID> postConta(@RequestBody NovaContaDTO dto) {
         Conta conta = new Conta();
-        conta.setNome(nome);
+        conta.setNome(dto.getNome());
+        conta.setEmail(dto.getEmail());
+        conta.setCnpj(dto.getCnpj());
+        conta.setSenha(dto.getSenha());
+        conta.setPerfil(dto.getPerfil());
         conta = contaService.novaConta(conta);
         return ResponseEntity.ok(conta.getUuid());
     }

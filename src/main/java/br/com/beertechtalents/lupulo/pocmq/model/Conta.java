@@ -1,12 +1,14 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
+import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,20 +21,39 @@ public class Conta implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
-    @Column(nullable = false)
-    String nome;
+    private Long id;
 
     // Length deve ser 16 pois o default do hibernate é 255 e o UUID usa 16
     @NaturalId
     @Column(unique = true, columnDefinition = "BINARY(16)")
-    UUID uuid = UUID.randomUUID();
+    private UUID uuid = UUID.randomUUID();
+
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private BigInteger cnpj;
+
+    @Column(nullable = false)
+    private String senha; // TODO: Adicionar criptografia
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private PerfilUsuario perfil;
 
     @CreatedDate
-    Timestamp criadoEm;
+    private Timestamp criadoEm;
 
     @OneToMany(mappedBy = "conta")
     List<Operacao> operacoes = new ArrayList<>();
+
+    public enum PerfilUsuario {
+        ADMIN,
+        USER
+    }
 
 }
