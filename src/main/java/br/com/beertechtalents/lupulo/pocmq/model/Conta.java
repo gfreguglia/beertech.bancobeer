@@ -38,7 +38,7 @@ public class Conta implements Serializable {
     private String email;
 
     @Column(nullable = false, unique = true)
-    private BigInteger cnpj;
+    private String cnpj;
 
     @Column(nullable = false)
     private String senha; // TODO: Adicionar criptografia
