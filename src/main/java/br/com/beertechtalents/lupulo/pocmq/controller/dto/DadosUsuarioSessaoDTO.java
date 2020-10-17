@@ -10,6 +10,6 @@ public class DadosUsuarioSessaoDTO {
     final String token;
     final String email;
     final String nome;
-    final BigInteger cnpj;
+    final String cnpj;
     final Conta.PerfilUsuario perfil;
 }
