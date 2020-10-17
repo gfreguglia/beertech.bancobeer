@@ -34,10 +34,10 @@ public class Conta implements Serializable {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private BigInteger cnpj;
 
     @Column(nullable = false)

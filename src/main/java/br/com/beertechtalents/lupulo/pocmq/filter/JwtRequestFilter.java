@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import br.com.beertechtalents.lupulo.pocmq.service.JwtUserDetailsService;
 import br.com.beertechtalents.lupulo.pocmq.util.JwtTokenUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,13 +20,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
+@AllArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    JwtUserDetailsService jwtUserDetailsService;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    JwtTokenUtil jwtTokenUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -35,18 +35,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        // JWT Token está no form "Bearer token". Remova a palavra Bearer e pegue somente o Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            jwtToken = requestTokenHeader.replace("Bearer ", "");
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unable to get Token");
+                return;
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token has expired");
+                return;
             }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
         }
 
         // Tendo o token, valide o.
