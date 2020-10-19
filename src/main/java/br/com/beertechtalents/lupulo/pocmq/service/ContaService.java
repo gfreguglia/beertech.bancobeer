@@ -6,6 +6,7 @@ import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,11 +19,15 @@ public class ContaService {
 
     ContaRepository contaRepository;
 
+    PasswordEncoder passwordEncoder;
+
     public Page<Conta> getPageConta(int page, int size) {
         return contaRepository.findAll(PageRequest.of(page, size));
     }
 
     public Conta novaConta(Conta conta) {
+        String encode = passwordEncoder.encode(conta.getSenha());
+        conta.setSenha(encode);
         return contaRepository.save(conta);
     }
 
