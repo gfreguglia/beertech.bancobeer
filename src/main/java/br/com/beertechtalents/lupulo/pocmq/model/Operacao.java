@@ -24,6 +24,11 @@ public class Operacao implements Serializable {
     @Setter
     private TipoTransacao tipo;
 
+    @Column(length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private TipoTransacao tipoMovimentacao;
+
     @Column(precision = 15, scale = 2, nullable = false)
     @Setter
     private BigDecimal valor;
@@ -34,6 +39,7 @@ public class Operacao implements Serializable {
             referencedColumnName = "uuid",
             columnDefinition = "BINARY(16)"
     )
+
     @Setter
     private Conta conta;
 
@@ -42,7 +48,8 @@ public class Operacao implements Serializable {
 
     public enum TipoTransacao {
         DEPOSITO,
-        SAQUE
+        SAQUE,
+        TRANSFERENCIA
     }
 
 }
