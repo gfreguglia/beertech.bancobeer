@@ -1,8 +1,8 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessaoDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtRequest;
-import br.com.beertechtalents.lupulo.pocmq.model.Conta;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtResponse;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.util.JwtTokenUtil;
 import lombok.AllArgsConstructor;
@@ -15,8 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 
 @RestController
@@ -41,7 +39,7 @@ public class JwtAuthenticationController {
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(getUserDetails(token, authenticationRequest.getUsername()));
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -51,16 +49,6 @@ public class JwtAuthenticationController {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
-        }
-    }
-
-    private DadosUsuarioSessaoDTO getUserDetails(String token, String username){
-        Optional<Conta> conta = contaService.findByEmail(username);
-
-        if (conta.isEmpty()) {
-            return null; // TODO: melhorar este return!
-        } else {
-            return new DadosUsuarioSessaoDTO(token, conta.get().getEmail(), conta.get().getNome(), conta.get().getCnpj(), conta.get().getPerfil());
         }
     }
 

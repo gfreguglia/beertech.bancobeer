@@ -1,18 +1,20 @@
 package br.com.beertechtalents.lupulo.pocmq.util;
 
-import java.io.Serializable;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import io.jsonwebtoken.Claims;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -51,8 +53,18 @@ public class JwtTokenUtil implements Serializable {
 
     //gera token para user
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        if(userDetails instanceof DadosUsuarioSessao) {
+            DadosUsuarioSessao dadosUsuarioSessao = (DadosUsuarioSessao) userDetails;
+
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("email", dadosUsuarioSessao.getEmail());
+            claims.put("nome", dadosUsuarioSessao.getNome());
+            claims.put("cnpj", dadosUsuarioSessao.getCnpj());
+            claims.put("perfil", dadosUsuarioSessao.getPerfil());
+            return doGenerateToken(claims, dadosUsuarioSessao.getUsername());
+        } else {
+            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //Cria o token e devine tempo de expiração pra ele
