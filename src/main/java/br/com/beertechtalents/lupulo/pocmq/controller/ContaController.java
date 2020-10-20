@@ -97,7 +97,8 @@ public class ContaController {
             @ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
             @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size) {
         Page<ConsultaExtratoDTO> map = operacaoService.getPageOperacao(uuid, page, size)
-                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(), operacao.getValor()));
+                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(),
+                        operacao.getTipoMovimentacao(), operacao.getValor()));
 
         return ResponseEntity.ok(map);
     }
@@ -113,7 +114,8 @@ public class ContaController {
 
     ) {
         Page<ConsultaExtratoDTO> map = operacaoService.getPageExtrato(uuid, inicio, fim, page, size)
-                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(), operacao.getValor()));
+                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(),
+                        operacao.getTipoMovimentacao(), operacao.getValor()));
 
         return ResponseEntity.ok(map);
     }
