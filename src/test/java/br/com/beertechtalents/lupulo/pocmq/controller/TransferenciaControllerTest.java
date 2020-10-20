@@ -5,7 +5,6 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
-import br.com.beertechtalents.lupulo.pocmq.service.OperacaoService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,9 +36,6 @@ class TransferenciaControllerTest {
     @Autowired
     ContaRepository contaRepository;
 
-    @Autowired
-    OperacaoService operacaoService;
-
     Conta conta1 = new Conta();
     Conta conta2 = new Conta();
 
@@ -49,15 +45,15 @@ class TransferenciaControllerTest {
         Operacao operacao = new Operacao();
         conta1.setNome("CONTA");
         conta1 = contaService.novaConta(conta1);
-        operacao.setConta(conta1);
+//        operacao.setConta(conta1);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
         operacao.setValor(BigDecimal.valueOf(100));
-        operacaoService.salvarOperacao(operacao);
+//        operacaoService.salvarOperacao(operacao);
 
         conta2.setNome("CONTA");
         conta2 = contaService.novaConta(conta2);
         operacao = new Operacao();
-        operacao.setConta(conta2);
+//        operacao.setConta(conta2);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
         operacao.setValor(BigDecimal.valueOf(100));
     }

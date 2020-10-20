@@ -18,9 +18,6 @@ class OperacaoServiceTest {
     @Autowired
     ContaRepository contaRepository;
 
-    @Autowired
-    OperacaoService operacaoService;
-
     Conta conta = new Conta();
 
     @BeforeAll
@@ -34,7 +31,7 @@ class OperacaoServiceTest {
         Operacao op = new Operacao();
         op.setValor(BigDecimal.valueOf(10.0));
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
-        op.setConta(conta);
-        operacaoService.salvarOperacao(op);
+//        op.setConta(conta);
+//        operacaoService.salvarOperacao(op);
     }
 }

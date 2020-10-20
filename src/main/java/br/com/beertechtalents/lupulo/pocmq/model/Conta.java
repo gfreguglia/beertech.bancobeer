@@ -2,59 +2,61 @@ package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
 import lombok.Setter;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
-@Entity
+
 @Data
-@EntityListeners(AuditingEntityListener.class)
-public class Conta implements Serializable {
+@Document
+public class Conta {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     // Length deve ser 16 pois o default do hibernate é 255 e o UUID usa 16
-    @NaturalId
-    @Column(unique = true, columnDefinition = "BINARY(16)")
+    @Indexed(unique = true)
     private UUID uuid = UUID.randomUUID();
 
-    @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(name = "_email", unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String cnpj;
 
-    @Column(nullable = false)
-    private String senha; // TODO: Adicionar criptografia
+    private String senha;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    private BigDecimal saldo = BigDecimal.ZERO;
+
     @Setter
     private PerfilUsuario perfil;
 
     @CreatedDate
-    private Timestamp criadoEm;
+    private Date criadoEm;
 
-    @OneToMany(mappedBy = "conta")
     List<Operacao> operacoes = new ArrayList<>();
 
-    public Collection<? extends GrantedAuthority> getAuthorities(){
+    public void depositar(Operacao op) {
+        this.saldo = this.saldo.add(op.getValor());
+        this.operacoes.add(op);
+    }
+
+    public void sacar(Operacao op) {
+        this.saldo = this.saldo.subtract(op.getValor());
+        this.operacoes.add(op);
+    }
+
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         GrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(perfil.toString());
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);

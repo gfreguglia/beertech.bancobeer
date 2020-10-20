@@ -44,7 +44,7 @@ class ContaServiceTest {
         Conta nova = new Conta();
         nova.setNome("NOVA CONTA");
         nova = contaService.novaConta(nova);
-        assertThat(nova.getId()).isGreaterThan(0);
+        assertThat(nova.getId()).isNotBlank();
     }
 
     @Test

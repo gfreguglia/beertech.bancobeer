@@ -1,44 +1,21 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Data;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Date;
 
-@Entity
-@Getter
-@EntityListeners(AuditingEntityListener.class)
-public class Operacao implements Serializable {
+@Data
+public class Operacao {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(length = 10, nullable = false)
-    @Enumerated(EnumType.STRING)
-    @Setter
+    @Indexed
     private TipoTransacao tipo;
 
-    @Column(precision = 15, scale = 2, nullable = false)
-    @Setter
     private BigDecimal valor;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "conta_uuid",
-            referencedColumnName = "uuid",
-            columnDefinition = "BINARY(16)"
-    )
-    @Setter
-    private Conta conta;
-
-    @CreatedDate
-    private Timestamp datahora;
+    private Date datahora = new Date(Instant.now().toEpochMilli());
 
     public enum TipoTransacao {
         DEPOSITO,

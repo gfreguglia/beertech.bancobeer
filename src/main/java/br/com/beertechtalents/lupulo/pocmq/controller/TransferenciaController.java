@@ -26,6 +26,7 @@ public class TransferenciaController {
     @ApiOperation(value = "Realizar transferencia")
     public CompletableFuture<?> novaTransferencia(@RequestBody NovaTransferenciaDTO dto) {
 
+        dto.setValor(dto.getValor().abs());
 
         return CompletableFuture.supplyAsync(() -> {
             try {

@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,9 +19,6 @@ class TransferenciaServiceTest {
 
     @Autowired
     ContaService contaService;
-
-    @Autowired
-    OperacaoService operacaoService;
 
     @Autowired
     TransferenciaService transferenciaService;
@@ -38,11 +35,11 @@ class TransferenciaServiceTest {
         conta2 = contaService.novaConta(conta2);
 
         Operacao op = new Operacao();
-        op.setConta(conta1);
+//        op.setConta(conta1);
         op.setValor(BigDecimal.valueOf(100.0));
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
 
-        operacaoService.salvarOperacao(op);
+//        operacaoService.salvarOperacao(op);
 
     }
 

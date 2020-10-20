@@ -5,11 +5,10 @@ import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,31 +16,26 @@ import java.util.UUID;
 public class TransferenciaService {
 
     ContaService contaService;
-    OperacaoService operacaoService;
 
     @Transactional
     public void transferir(UUID origem, UUID destino, BigDecimal valor) throws HttpClientErrorException {
-        Optional<Conta> optionalContaOrigem = contaService.getConta(origem);
-        if(optionalContaOrigem.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta origem não encontrada.");
-        }
+        Conta contaOrigem = contaService.getConta(origem).orElseThrow(() ->
+                new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta origem não encontrada."));
 
         Operacao op = new Operacao();
         op.setValor(valor);
         op.setTipo(Operacao.TipoTransacao.SAQUE);
-        op.setConta(optionalContaOrigem.get());
-        operacaoService.salvarOperacao(op);
+        contaOrigem.sacar(op);
+        contaService.atualizaConta(contaOrigem);
 
-        Optional<Conta> optionalContaDestino = contaService.getConta(destino);
-        if(optionalContaDestino.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta destino não encontrada.");
-        }
+
+        Conta contaDestino = contaService.getConta(destino).orElseThrow(() ->
+                new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta destino não encontrada."));
 
         op = new Operacao();
         op.setValor(valor);
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
-        op.setConta(optionalContaDestino.get());
-        operacaoService.salvarOperacao(op);
-
+        contaDestino.depositar(op);
+        contaService.atualizaConta(contaDestino);
     }
 }
