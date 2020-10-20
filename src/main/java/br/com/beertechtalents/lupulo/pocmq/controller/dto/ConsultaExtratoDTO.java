@@ -11,6 +11,6 @@ import java.math.BigDecimal;
 public class ConsultaExtratoDTO {
     final Long id;
     final Operacao.TipoTransacao tipo;
-    final Operacao.TipoTransacao tipoMovimentacao;
+    final Operacao.DescricaoOperacao descricaoOperacao;
     final BigDecimal valor;
 }

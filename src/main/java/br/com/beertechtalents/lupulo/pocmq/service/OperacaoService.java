@@ -22,11 +22,6 @@ public class OperacaoService {
 
     @PreAuthorize("isAuthenticated()")
     public void salvarOperacao(Operacao operacao) {
-
-        if (operacao.getTipoMovimentacao() == null) {
-            operacao.setTipoMovimentacao(operacao.getTipo());
-        }
-
         switch (operacao.getTipo()) {
             case SAQUE:
                 salvarSaque(operacao);

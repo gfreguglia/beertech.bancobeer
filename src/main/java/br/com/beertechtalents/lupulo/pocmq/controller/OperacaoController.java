@@ -49,6 +49,13 @@ public class OperacaoController {
         op.setConta(optionalConta.get());
         op.setTipo(dto.getTipo());
         op.setValor(dto.getValor());
+
+        if (op.getTipo().equals(Operacao.TipoTransacao.DEPOSITO)) {
+            op.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
+        } else {
+            op.setDescricaoOperacao(Operacao.DescricaoOperacao.SAQUE);
+        }
+
         operacaoService.salvarOperacao(op);
         return new ResponseEntity<>(HttpStatus.OK);
     }

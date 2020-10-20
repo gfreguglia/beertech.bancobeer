@@ -27,7 +27,7 @@ public class Operacao implements Serializable {
     @Column(length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
     @Setter
-    private TipoTransacao tipoMovimentacao;
+    private DescricaoOperacao descricaoOperacao;
 
     @Column(precision = 15, scale = 2, nullable = false)
     @Setter
@@ -48,8 +48,14 @@ public class Operacao implements Serializable {
 
     public enum TipoTransacao {
         DEPOSITO,
+        SAQUE
+    }
+
+    public enum DescricaoOperacao {
+        DEPOSITO,
         SAQUE,
-        TRANSFERENCIA
+        TRANSFERENCIA_ORIGEM,
+        TRANSFERENCIA_DESTINO,
     }
 
 }
