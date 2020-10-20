@@ -1,9 +1,11 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtRequest;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtResponse;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.util.JwtTokenUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,15 +14,12 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @CrossOrigin
+@AllArgsConstructor
 public class JwtAuthenticationController {
 
     @Autowired
@@ -31,6 +30,8 @@ public class JwtAuthenticationController {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    ContaService contaService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -50,4 +51,5 @@ public class JwtAuthenticationController {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
+
 }

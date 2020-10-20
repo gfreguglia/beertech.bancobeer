@@ -1,15 +1,13 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -24,7 +22,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
-            return new User(login,"",conta.getAuthorities());
+            return new DadosUsuarioSessao(login, "", conta.getAuthorities(), conta.getEmail(), conta.getNome(), conta.getCnpj(), conta.getPerfil());
         } else {
             return null;
         }
