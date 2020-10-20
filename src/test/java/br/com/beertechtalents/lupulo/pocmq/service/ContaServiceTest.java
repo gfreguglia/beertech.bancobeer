@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,10 @@ class ContaServiceTest {
     @BeforeAll
     void setUp() {
         conta1.setNome("CONTA");
+        conta1.setEmail("conta@email.com");
+        conta1.setSenha("senha");
+        conta1.setCnpj(BigInteger.TEN);
+        conta1.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta1 = contaRepository.save(conta1);
     }
 
@@ -43,6 +48,10 @@ class ContaServiceTest {
     void novaConta() {
         Conta nova = new Conta();
         nova.setNome("NOVA CONTA");
+        nova.setEmail("conta_nova@email.com");
+        nova.setSenha("senha_nova");
+        nova.setCnpj(BigInteger.ONE);
+        nova.setPerfil(Conta.PerfilUsuario.USER);
         nova = contaService.novaConta(nova);
         assertThat(nova.getId()).isGreaterThan(0);
     }
@@ -57,4 +66,6 @@ class ContaServiceTest {
     void computeSaldo() {
         assertThat(contaService.computeSaldo(conta1)).isEqualTo(BigDecimal.valueOf(0.0));
     }
+
+
 }

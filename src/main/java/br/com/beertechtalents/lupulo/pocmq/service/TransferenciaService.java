@@ -29,6 +29,7 @@ public class TransferenciaService {
         Operacao op = new Operacao();
         op.setValor(valor);
         op.setTipo(Operacao.TipoTransacao.SAQUE);
+        op.setDescricaoOperacao(Operacao.DescricaoOperacao.TRANSFERENCIA_ORIGEM);
         op.setConta(optionalContaOrigem.get());
         operacaoService.salvarOperacao(op);
 
@@ -40,6 +41,7 @@ public class TransferenciaService {
         op = new Operacao();
         op.setValor(valor);
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        op.setDescricaoOperacao(Operacao.DescricaoOperacao.TRANSFERENCIA_DESTINO);
         op.setConta(optionalContaDestino.get());
         operacaoService.salvarOperacao(op);
 
