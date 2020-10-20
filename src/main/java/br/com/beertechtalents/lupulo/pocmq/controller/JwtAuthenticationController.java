@@ -1,6 +1,5 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtRequest;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtResponse;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;

@@ -7,10 +7,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @Entity
 @Data
 @EntityListeners(AuditingEntityListener.class)
+@Validated
 public class Conta implements Serializable {
 
     @Id
@@ -35,13 +38,15 @@ public class Conta implements Serializable {
     private String nome;
 
     @Column(nullable = false, unique = true)
+    @Email
     private String email;
 
     @Column(nullable = false, unique = true)
+    @Size(min = 14, max = 14)
     private String cnpj;
 
     @Column(nullable = false)
-    private String senha; // TODO: Adicionar criptografia
+    private String senha;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
