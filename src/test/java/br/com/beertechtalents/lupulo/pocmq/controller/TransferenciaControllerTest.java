@@ -1,11 +1,15 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtRequest;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.JwtResponse;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaTransferenciaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.service.OperacaoService;
+import br.com.beertechtalents.lupulo.pocmq.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -35,31 +39,51 @@ class TransferenciaControllerTest {
     ContaService contaService;
 
     @Autowired
-    ContaRepository contaRepository;
+    OperacaoService operacaoService;
 
     @Autowired
-    OperacaoService operacaoService;
+    JwtTokenUtil jwtTokenUtil;
 
     Conta conta1 = new Conta();
     Conta conta2 = new Conta();
+
+    HttpHeaders httpHeaders;
 
     @BeforeAll
     void setUp() {
 
         Operacao operacao = new Operacao();
         conta1.setNome("CONTA");
+        conta1.setEmail("conta4@email.com");
+        conta1.setSenha("senha");
+        conta1.setCnpj("12345678901233");
+        conta1.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta1 = contaService.novaConta(conta1);
         operacao.setConta(conta1);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        operacao.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
         operacao.setValor(BigDecimal.valueOf(100));
         operacaoService.salvarOperacao(operacao);
 
-        conta2.setNome("CONTA");
+        conta2.setNome("CONTA2");
+        conta2.setEmail("conta7@email.com");
+        conta2.setSenha("senha2");
+        conta2.setCnpj("12345678904321");
+        conta2.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta2 = contaService.novaConta(conta2);
         operacao = new Operacao();
         operacao.setConta(conta2);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        operacao.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
         operacao.setValor(BigDecimal.valueOf(100));
+
+        DadosUsuarioSessao userDetails = new DadosUsuarioSessao(conta1.getEmail(), "", conta1.getAuthorities(),
+                conta1.getEmail(), conta1.getNome(), conta1.getCnpj(), conta1.getPerfil());
+        String token = jwtTokenUtil.generateToken(userDetails);
+
+        httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.setBearerAuth(token);
     }
 
     @Test
@@ -74,8 +98,6 @@ class TransferenciaControllerTest {
         dto.setDestino(conta2.getUuid());
         dto.setValor(new BigDecimal("50.00"));
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity entity = new HttpEntity(dto, httpHeaders);
 
         ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
@@ -91,7 +113,9 @@ class TransferenciaControllerTest {
                 .queryParam("destino", conta2.getUuid())
                 .queryParam("valor", 100);
 
-        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, null, String.class);
+        HttpEntity entity = new HttpEntity(httpHeaders);
+
+        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
         assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
     }
 
@@ -104,7 +128,9 @@ class TransferenciaControllerTest {
                 .queryParam("destino", UUID.randomUUID())
                 .queryParam("valor", 100);
 
-        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, null, String.class);
+        HttpEntity entity = new HttpEntity(httpHeaders);
+
+        ResponseEntity<?> responseEntity = this.restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
         assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
     }
 }

@@ -32,7 +32,16 @@ class TransferenciaServiceTest {
     @BeforeAll
     void setUp() {
         conta1.setNome("ORIGEM");
+        conta1.setEmail("conta1@email.com");
+        conta1.setSenha("senha");
+        conta1.setCnpj("12345678901238");
+        conta1.setPerfil(Conta.PerfilUsuario.ADMIN);
+
         conta2.setNome("DESTINO");
+        conta2.setEmail("destino1@email.com");
+        conta2.setSenha("destino");
+        conta2.setCnpj("12345678904329");
+        conta2.setPerfil(Conta.PerfilUsuario.ADMIN);
 
         conta1 = contaService.novaConta(conta1);
         conta2 = contaService.novaConta(conta2);
@@ -41,16 +50,19 @@ class TransferenciaServiceTest {
         op.setConta(conta1);
         op.setValor(BigDecimal.valueOf(100.0));
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        op.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
 
         operacaoService.salvarOperacao(op);
 
     }
 
     @Test
-    @Transactional
     void transferir() {
-        transferenciaService.transferir(conta1.getUuid(), conta2.getUuid(), BigDecimal.valueOf(10.0));
+        transferenciaService.transferir(conta1.getUuid(), conta2.getUuid(), BigDecimal.TEN);
+    }
 
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    private void conferirSaldo() {
         conta1 = contaService.getConta(conta1.getUuid()).orElse(null);
         conta2 = contaService.getConta(conta2.getUuid()).orElse(null);
 
@@ -59,6 +71,5 @@ class TransferenciaServiceTest {
 
         assertThat(saldo1.compareTo(new BigDecimal("90.0"))).isEqualTo(0);
         assertThat(saldo2.compareTo(new BigDecimal("10.0"))).isEqualTo(0);
-
     }
 }

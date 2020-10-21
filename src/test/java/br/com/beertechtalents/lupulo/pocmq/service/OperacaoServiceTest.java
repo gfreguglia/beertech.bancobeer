@@ -33,19 +33,30 @@ class OperacaoServiceTest {
     @BeforeAll
     void setUp() {
         conta.setNome("CONTA");
-        conta.setEmail("conta@email.com");
+        conta.setEmail("conta2@email.com");
         conta.setSenha("senha");
-        conta.setCnpj(BigInteger.TEN);
+        conta.setCnpj("12345678901237");
         conta.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta = contaRepository.save(conta);
     }
 
     @Test
     @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
-    void salvarOperacao() {
+    void salvarOperacaoDeposito() {
         Operacao op = new Operacao();
         op.setValor(BigDecimal.valueOf(10.0));
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
+        op.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
+        op.setConta(conta);
+        operacaoService.salvarOperacao(op);
+    }
+
+    @WithMockUser(username = "conta@email.com", password = "senha", authorities = "USER")
+    void salvarOperacaoSaque() {
+        Operacao op = new Operacao();
+        op.setValor(BigDecimal.valueOf(10.0));
+        op.setTipo(Operacao.TipoTransacao.SAQUE);
+        op.setDescricaoOperacao(Operacao.DescricaoOperacao.SAQUE);
         op.setConta(conta);
         operacaoService.salvarOperacao(op);
     }
@@ -53,7 +64,7 @@ class OperacaoServiceTest {
     @Test
     @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
     void getOperacao() {
-        salvarOperacao();
+        salvarOperacaoDeposito();
 
         Page<Operacao> pageOperacao = operacaoService.getPageOperacao(conta.getUuid(), 0, 10);
         assertThat(pageOperacao.getContent().get(0).getTipo()).isEqualTo(Operacao.TipoTransacao.DEPOSITO);
@@ -62,7 +73,7 @@ class OperacaoServiceTest {
     @Test
     @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
     void getExtrato() {
-        salvarOperacao();
+        salvarOperacaoDeposito();
         Timestamp init = conta.getCriadoEm();
         Timestamp end = new Timestamp(System.currentTimeMillis());
 

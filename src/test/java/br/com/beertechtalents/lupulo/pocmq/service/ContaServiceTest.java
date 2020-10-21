@@ -31,9 +31,9 @@ class ContaServiceTest {
     @BeforeAll
     void setUp() {
         conta1.setNome("CONTA");
-        conta1.setEmail("conta@email.com");
+        conta1.setEmail("conta3@email.com");
         conta1.setSenha("senha");
-        conta1.setCnpj(BigInteger.TEN);
+        conta1.setCnpj("12345678901235");
         conta1.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta1 = contaRepository.save(conta1);
     }
@@ -48,9 +48,9 @@ class ContaServiceTest {
     void novaConta() {
         Conta nova = new Conta();
         nova.setNome("NOVA CONTA");
-        nova.setEmail("conta_nova@email.com");
+        nova.setEmail("conta_nova3@email.com");
         nova.setSenha("senha_nova");
-        nova.setCnpj(BigInteger.ONE);
+        nova.setCnpj("12345678904326");
         nova.setPerfil(Conta.PerfilUsuario.USER);
         nova = contaService.novaConta(nova);
         assertThat(nova.getId()).isGreaterThan(0);
