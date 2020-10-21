@@ -5,6 +5,9 @@ import br.com.beertechtalents.lupulo.pocmq.service.TransferenciaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +25,10 @@ public class TransferenciaController {
 
     TransferenciaService transferenciaService;
 
+    @Async
     @PostMapping
     @ApiOperation(value = "Realizar transferencia")
     public CompletableFuture<?> novaTransferencia(@RequestBody NovaTransferenciaDTO dto) {
-
 
         return CompletableFuture.supplyAsync(() -> {
             try {
