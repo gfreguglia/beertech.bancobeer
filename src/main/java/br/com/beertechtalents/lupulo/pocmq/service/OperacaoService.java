@@ -26,7 +26,6 @@ public class OperacaoService {
      @Autowired ContaRepository contaRepository;
      @Autowired ContaService contaService;
 
-    @PreAuthorize("isAuthenticated()")
     public void salvarOperacao(Operacao operacao) {
         Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid()).get();
         switch (operacao.getTipo()) {
@@ -46,7 +45,6 @@ public class OperacaoService {
 
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     private void salvarDeposito(Operacao operacao) {
         operacaoRepository.save(operacao);
     }
