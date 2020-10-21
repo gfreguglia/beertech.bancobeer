@@ -48,7 +48,6 @@ public class OperacaoService {
 
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     private void salvarDeposito(Operacao operacao) {
         operacaoRepository.save(operacao);
     }

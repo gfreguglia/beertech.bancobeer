@@ -1,6 +1,7 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaOperacaoDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaOperacaoJms;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaTransferenciaDTO;
 import br.com.beertechtalents.lupulo.pocmq.service.ProducerService;
 import io.swagger.annotations.Api;
@@ -8,11 +9,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/producer")
@@ -23,10 +22,19 @@ public class ProducerController {
 
     ProducerService producerService;
 
-    @ApiOperation("Criar nova operação")
-    @PostMapping(value = "/operacao", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> postOperacao(@RequestBody NovaOperacaoDTO operacaoDTO) {
-        producerService.sendOperacao(operacaoDTO);
+    @ApiOperation("Novo Saque")
+    @PostMapping(value = "/operacao:saque", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Void> postOperacao(@RequestBody NovaOperacaoJms novaOperacaoJms) {
+        producerService.sendSaque(novaOperacaoJms);
+
+        return ResponseEntity.accepted().build();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ApiOperation("Novo Deposito")
+    @PostMapping(value = "/operacao:deposito", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Void> postDeposito(@RequestBody NovaOperacaoJms novaOperacaoJms) {
+        producerService.sendDeposito(novaOperacaoJms);
 
         return ResponseEntity.accepted().build();
     }
