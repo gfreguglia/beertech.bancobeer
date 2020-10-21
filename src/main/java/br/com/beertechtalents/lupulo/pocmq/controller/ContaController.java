@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
@@ -52,6 +53,36 @@ public class ContaController {
     @GetMapping("/{uuid}")
     public ResponseEntity<ConsultaContaDTO> getConta(@PathVariable UUID uuid) {
         Optional<Conta> optionalConta = contaService.getConta(uuid);
+        if (optionalConta.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Conta conta = optionalConta.get();
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+        return ResponseEntity.ok(dto);
+    }
+
+    @ApiOperation("Consulta de conta por email")
+    @GetMapping(params = "email",produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ConsultaContaDTO> getContaPorEmail(
+            @ApiParam("Email da conta") @RequestParam(required = true) @Email String email) {
+
+        Optional<Conta> optionalConta= contaService.findByEmail(email);
+
+        if (optionalConta.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Conta conta = optionalConta.get();
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+        return ResponseEntity.ok(dto);
+    }
+
+    @ApiOperation("Consulta de conta por cnpj")
+    @GetMapping(params = "cnpj",produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ConsultaContaDTO> getContaPorCnpj(
+            @ApiParam("Cnpj da conta") @RequestParam(required = false) String cnpj) {
+
+        Optional<Conta> optionalConta = contaService.findByCnpj(cnpj);
+
         if (optionalConta.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

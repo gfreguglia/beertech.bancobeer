@@ -45,4 +45,8 @@ public class ContaService {
     public Optional<Conta> findByEmail(String email) {
         return contaRepository.findByEmail(email);
     }
+
+    public Optional<Conta> findByCnpj(String cnpj) {
+        return contaRepository.findByCnpj(cnpj);
+    }
 }
