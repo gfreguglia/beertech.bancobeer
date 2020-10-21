@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface ContaRepository extends JpaRepository<Conta, Long> {
     Optional<Conta> findByUuid(UUID uuid);
     Optional<Conta> findByEmail(String email);
+    Optional<Conta> findByCnpj(String cnpj);
 }
