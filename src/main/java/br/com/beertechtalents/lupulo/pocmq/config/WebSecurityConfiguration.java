@@ -53,8 +53,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable()
-                // Não cheque essas requisições
+        httpSecurity.csrf().disable();
+        httpSecurity.cors().disable();
+
+        // Não cheque essas requisições
+        httpSecurity
                 .authorizeRequests().antMatchers("/authenticate","/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/conta").permitAll().
 
