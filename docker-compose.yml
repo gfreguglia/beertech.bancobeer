@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   poc-mq:
-    image: poc-mq:latest
+    image: beertech-bancobeer-conta:latest
     restart: on-failure
     environment:
       SPRING_PROFILES_ACTIVE: docker
