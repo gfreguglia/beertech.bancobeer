@@ -3,6 +3,8 @@ package br.com.beertechtalents.lupulo.pocmq.filter;
 import br.com.beertechtalents.lupulo.pocmq.service.JwtUserDetailsService;
 import br.com.beertechtalents.lupulo.pocmq.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +45,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token has expired");
                 return;
+            } catch (MalformedJwtException | SignatureException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid");
+                return;
             }
         }
 
@@ -50,6 +55,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
+            if (userDetails == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token contains invalid user");
+                return;
+            }
             if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(jwtToken, userDetails))) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
