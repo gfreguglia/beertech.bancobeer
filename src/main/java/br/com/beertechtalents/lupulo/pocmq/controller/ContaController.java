@@ -143,7 +143,8 @@ public class ContaController {
                         operacao.getDescricaoOperacao(),
                         operacao.getValor(),
                         operacao.getCategoria() != null ? operacao.getCategoria().toString() : null,
-                        operacao.getDatahora()));
+                        operacao.getDatahora(),
+                        operacao.getSaldoAtual()));
 
         return ResponseEntity.ok(map);
     }
@@ -165,7 +166,8 @@ public class ContaController {
                         operacao.getDescricaoOperacao(),
                         operacao.getValor(),
                         operacao.getCategoria() != null ? operacao.getCategoria().toString() : null,
-                        operacao.getDatahora()));
+                        operacao.getDatahora(),
+                        operacao.getSaldoAtual()));
 
         return ResponseEntity.ok(map);
     }

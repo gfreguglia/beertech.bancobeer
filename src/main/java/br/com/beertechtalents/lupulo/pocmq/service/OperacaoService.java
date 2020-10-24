@@ -6,6 +6,7 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.repository.OperacaoRepository;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
@@ -32,15 +33,18 @@ public class OperacaoService {
     @Transactional
     public void salvarOperacao(Operacao operacao) {
         Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid()).get();
+        final BigDecimal saldo = contaService.computeSaldo(conta);
         switch (operacao.getTipo()) {
             case SAQUE:
-                if (contaService.computeSaldo(conta).compareTo(operacao.getValor()) >= 0) {
+                if (saldo.compareTo(operacao.getValor()) >= 0) {
+                    operacao.setSaldoAtual(saldo.subtract(operacao.getValor()));
                     salvarSaque(operacao);
                     break;
                 } else {
                     throw new HttpClientErrorException(HttpStatus.PRECONDITION_FAILED, "Insufficient funds");
                 }
             case DEPOSITO:
+                operacao.setSaldoAtual(saldo.add(operacao.getValor()));
                 salvarDeposito(operacao);
                 break;
             default:

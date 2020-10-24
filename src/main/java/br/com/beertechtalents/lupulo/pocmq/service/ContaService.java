@@ -7,6 +7,8 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
+import java.util.Collections;
+import java.util.Comparator;
 import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,10 +42,11 @@ public class ContaService {
     }
 
     public BigDecimal computeSaldo(Conta conta) {
-        return conta.getOperacoes()
-                .stream()
-                .map(operacao -> operacao.getTipo().equals(Operacao.TipoTransacao.SAQUE) ? operacao.getValor().negate() : operacao.getValor())
-                .reduce(BigDecimal.valueOf(0.0), BigDecimal::add);
+        BigDecimal saldo = conta.getOperacoes().stream()
+            .max(Comparator.comparing(Operacao::getId))
+            .map(Operacao::getSaldoAtual)
+            .orElse(BigDecimal.ZERO);
+        return saldo;
     }
 
     public Optional<Conta> findByEmail(String email) {
