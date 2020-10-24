@@ -2,7 +2,6 @@ package br.com.beertechtalents.lupulo.pocmq.service;
 
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OperationEvents;
-import br.com.beertechtalents.lupulo.pocmq.exception.BusinessException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
@@ -42,7 +41,7 @@ public class OperacaoService {
                     salvarSaque(operacao);
                     break;
                 } else {
-                    throw BusinessException.insufficientFund();
+                    throw new HttpClientErrorException(HttpStatus.PRECONDITION_FAILED, "Insufficient funds");
                 }
             case DEPOSITO:
                 operacao.setSaldoAtual(saldo.add(operacao.getValor()));
