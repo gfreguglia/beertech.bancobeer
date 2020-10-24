@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,8 +33,7 @@ class OperacaoServiceTest {
         conta.setNome("CONTA");
         conta.setEmail("conta@email.com");
         conta.setSenha("senha");
-        conta.setCnpj("11111111111111");
-        conta.setPerfil(Conta.PerfilUsuario.ADMIN);
+        conta.setCnpj("12345678901234");
         conta = contaRepository.save(conta);
     }
 
