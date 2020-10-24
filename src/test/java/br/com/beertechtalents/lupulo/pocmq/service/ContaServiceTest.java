@@ -8,6 +8,7 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,7 +51,7 @@ class ContaServiceTest {
     RequestChangePasswordEvents requestChangePasswordEvents;
 
 
-    Conta conta1 = new Conta(1l, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
+    Conta conta1 = new Conta(1L, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
             "wdf245l*iuga", new Timestamp(100000), new ArrayList<>());
 
     //@Test
@@ -67,10 +68,7 @@ class ContaServiceTest {
         nova.setSenha("senha_nova");
         nova.setCnpj("11111111111111");
 
-        Mockito.when(contaRepository.save(Mockito.any(Conta.class))).then(i -> {
-            Conta contaBeforeSave = (Conta) i.getArguments()[0];
-            return contaBeforeSave;
-        });
+        Mockito.when(contaRepository.save(Mockito.any(Conta.class))).then(i -> i.getArguments()[0]);
 
         nova = contaService.salvar(nova);
 
@@ -84,7 +82,7 @@ class ContaServiceTest {
 
         Optional<Conta> conta = contaService.getConta(conta1.getUuid());
 
-        assertThat(conta.isPresent()).isTrue();
+        assertThat(conta).isPresent();
     }
 
     @Test
@@ -97,13 +95,12 @@ class ContaServiceTest {
     void requestResetarSenhaEmailInvalido() {
 
         Mockito.when(contaService.findByEmail(Mockito.any(String.class))).then(i -> Optional.empty());
-
-        contaService.sendRequestTrocarSenha("email");
+        Assertions.assertDoesNotThrow(() -> contaService.sendRequestTrocarSenha("email"));
     }
 
     @Test
     void requestResetarSenhaEmailValido() {
-        Long tokenId = 37l;
+        Long tokenId = 37L;
 
         Mockito.when(contaRepository.findByEmail(Mockito.any(String.class))).then(i -> Optional.of(conta1));
 
@@ -123,7 +120,7 @@ class ContaServiceTest {
 
 
         Mockito.when(requestChangePasswordEvents.createRequestChangePasswordEvents(Mockito.any(TokenTrocarSenha.class))).
-                then(i -> new OutboxEvent(1l, null, null));
+                then(i -> new OutboxEvent(1L, null, null));
         Mockito.doNothing().when(eventPublisher).fire(Mockito.any(OutboxEvent.class));
 
 
@@ -133,14 +130,9 @@ class ContaServiceTest {
 
     @Test
     void getContabyTokenResetarSenhaTokenInexistente() {
-
         Mockito.when(tokenResetarSenhaRepository.findByUuid(Mockito.any(UUID.class))).then(i -> Optional.empty());
-
-        try {
-            contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.getContabyTokenTrocarSenha(uuid));
     }
 
     @Test
@@ -151,12 +143,8 @@ class ContaServiceTest {
             ReflectionTestUtils.setField(tokenResetarSenha, "expiraEm", new Timestamp(1));
             return Optional.of(tokenResetarSenha);
         });
-
-        try {
-            contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.getContabyTokenTrocarSenha(uuid));
     }
 
     @Test
@@ -168,11 +156,9 @@ class ContaServiceTest {
             return Optional.of(tokenResetarSenha);
         });
 
-        try {
-            contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.getContabyTokenTrocarSenha(uuid));
+
     }
 
 
@@ -184,10 +170,11 @@ class ContaServiceTest {
             return Optional.of(tokenResetarSenha);
         });
 
-        Optional<Conta> optionalConta = contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
+        UUID uuid = UUID.randomUUID();
+        Optional<Conta> optionalConta = contaService.getContabyTokenTrocarSenha(uuid);
 
         if (optionalConta.isPresent()) {
-            assertThat(optionalConta.get()).isEqualTo(conta1);
+            assertThat(optionalConta).contains(conta1);
         } else {
             fail("Empty conta");
         }
@@ -202,11 +189,9 @@ class ContaServiceTest {
             return Optional.of(tokenResetarSenha);
         });
 
-        try {
-            contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        UUID contaId = conta1.getUuid();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.trocarSenha(contaId, "nova senha", uuid));
     }
 
     @Test
@@ -217,29 +202,26 @@ class ContaServiceTest {
             return Optional.of(tokenResetarSenha);
         });
 
-        try {
-            contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        UUID contaId = conta1.getUuid();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.trocarSenha(contaId, "nova senha", uuid));
+
     }
 
     @Test
     void trocaSenhaTokenInexistente() {
         Mockito.when(tokenResetarSenhaRepository.findByUuid(Mockito.any(UUID.class))).then(i -> Optional.empty());
 
-        try {
-            contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        UUID contaId = conta1.getUuid();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.trocarSenha(contaId, "nova senha", uuid));
     }
 
     @Test
     void trocaSenhaTokenOutraConta() {
         Mockito.when(tokenResetarSenhaRepository.findByUuid(Mockito.any(UUID.class))).then(i -> {
             Conta outraConta = new Conta();
-            outraConta.setId(2l);
+            outraConta.setId(2L);
             outraConta.setEmail("outro@mail.com");
             outraConta.setSenha("outra senha");
 
@@ -247,11 +229,10 @@ class ContaServiceTest {
             return Optional.of(tokenResetarSenha);
         });
 
-        try {
-            contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
-            fail("Erro na validacao de token");
-        } catch (TokenInvalidException e) {
-        }
+        UUID uuid = UUID.randomUUID();
+        UUID contaId = conta1.getUuid();
+        Assertions.assertThrows(TokenInvalidException.class, () -> contaService.trocarSenha(contaId, "nova senha", uuid));
+
     }
 
 
@@ -279,8 +260,6 @@ class ContaServiceTest {
 
         contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
     }
-
-
 
 
 }
