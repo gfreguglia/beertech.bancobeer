@@ -34,7 +34,7 @@ public class TransferenciaController {
             try {
                 transferenciaService.transferir(dto.getOrigem(), dto.getDestino(), dto.getValor());
             } catch (HttpClientErrorException ex) {
-                return new ResponseEntity<>(ex.getStatusCode());
+                return new ResponseEntity<>(ex.getStatusText(), ex.getStatusCode());
             }
 
             return ResponseEntity.noContent().build();

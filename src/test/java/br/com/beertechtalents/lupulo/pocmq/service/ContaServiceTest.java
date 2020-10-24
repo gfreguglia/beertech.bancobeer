@@ -45,6 +45,15 @@ class ContaServiceTest {
     @Mock
     EventPublisher eventPublisher;
 
+    @BeforeAll
+    void setUp() {
+        conta1.setNome("CONTA");
+        conta1.setEmail("conta@email.com");
+        conta1.setSenha("senha");
+        conta1.setCnpj("11111111111111");
+        conta1 = contaRepository.save(conta1);
+    }
+
     @Mock
     TokenTrocarSenha tokenTrocarSenhaMock;
 
@@ -65,7 +74,6 @@ class ContaServiceTest {
         nova.setEmail("conta_nova@email.com");
         nova.setSenha("senha_nova");
         nova.setCnpj("11111111111111");
-
 
         Mockito.when(contaRepository.save(Mockito.any(Conta.class))).then(i -> {
             Conta contaBeforeSave = (Conta) i.getArguments()[0];
