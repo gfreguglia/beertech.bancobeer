@@ -2,6 +2,8 @@ package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,12 +18,17 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Entity
-@Getter
-public class TokenResetarSenha {
+@Data
+@NoArgsConstructor
+public class TokenTrocarSenha {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
+
+    @NaturalId
+    @Column(unique = true, columnDefinition = "BINARY(16)")
+    private UUID uuid = UUID.randomUUID();
 
     @NotNull
     private Timestamp expiraEm;
@@ -36,13 +43,13 @@ public class TokenResetarSenha {
     private Conta conta;
 
     @NotNull
-    private boolean usado;
+    private boolean invalido;
 
     private final long TEMPO_PARA_EXPERIAR_EM_MINUTOS = 60;
 
-    public TokenResetarSenha(Conta conta) {
+    public TokenTrocarSenha(Conta conta) {
         this.conta = conta;
-        this.usado = false;
+        this.invalido = false;
 
         this.expiraEm = new Timestamp(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(TEMPO_PARA_EXPERIAR_EM_MINUTOS));
     }
@@ -53,7 +60,7 @@ public class TokenResetarSenha {
         return expiraEm.compareTo(now) < 0;
     }
 
-    public void usar() {
-        this.usado = true;
+    public void invalidar() {
+        this.invalido = true;
     }
 }

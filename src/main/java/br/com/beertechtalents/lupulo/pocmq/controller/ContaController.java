@@ -155,17 +155,17 @@ public class ContaController {
 
     @ApiOperation("Envia um email link para de redifinir senha")
     @PostMapping("/pedido-resetar-senha")
-    public ResponseEntity<?> requestResetarSenha(@ApiParam("Email da conta") @RequestBody @Email String email) {
+    public ResponseEntity<?> requestTrocarSenha(@ApiParam("Email da conta") @RequestBody @Email String email) {
 
-        contaService.sendRequestResetarSenha(email);
+        contaService.sendRequestTrocarSenha(email);
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation("Pega a conta do token de resetar senha")
     @PostMapping("/conta-by-token-restar-senha")
-    public ResponseEntity<?>getContabyTokenResetarSenha(@ApiParam("Token de reset de senha") @RequestBody UUID tokenId) {
+    public ResponseEntity<?>getContabyTokenResetarSenha(@ApiParam("Token de reset de senha") @RequestBody UUID tokenUuid) {
 
-        Optional<Conta> optionalConta = contaService.getContabyTokenResetarSenha(tokenId);
+        Optional<Conta> optionalConta = contaService.getContabyTokenTrocarSenha(tokenUuid);
 
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
@@ -178,7 +178,7 @@ public class ContaController {
     }
 
     @ApiOperation("Troca a senha da conta")
-    @PatchMapping("/{id}")
+    @PatchMapping("/{uuid}")
     public ResponseEntity<?>trocarSenha(@PathVariable UUID uuid,
                                         @ApiParam("Nova senha e token de resetar senha") @RequestBody PatchTrocarSenhaDTO trocarSenhaDTO) {
 

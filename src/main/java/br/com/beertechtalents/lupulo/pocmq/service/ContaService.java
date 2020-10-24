@@ -1,8 +1,11 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
+import br.com.beertechtalents.lupulo.pocmq.events.RequestChangePasswordEvents;
+import br.com.beertechtalents.lupulo.pocmq.exception.TokenInvalidException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
-import br.com.beertechtalents.lupulo.pocmq.model.TokenResetarSenha;
+import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepository;
 import lombok.AllArgsConstructor;
@@ -22,15 +25,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ContaService {
 
-    ContaRepository contaRepository;
+    final ContaRepository contaRepository;
 
-    PasswordEncoder passwordEncoder;
+    final PasswordEncoder passwordEncoder;
 
-    TokenResetarSenhaRepository tokenResetarSenhaRepository;
+    final TokenResetarSenhaRepository tokenResetarSenhaRepository;
 
-    SendMailAdapter sendMailAdapter;
-
-    private static final String INVALID_TOKEN_MESSAGE = "";
+    final EventPublisher eventPublisher;
 
     public Page<Conta> getPageConta(int page, int size) {
         return contaRepository.findAll(PageRequest.of(page, size));
@@ -61,52 +62,51 @@ public class ContaService {
         return contaRepository.findByCnpj(cnpj);
     }
 
-    public void sendRequestResetarSenha(String email) {
+    public void sendRequestTrocarSenha(String email) {
 
         Optional<Conta> optionalConta = findByEmail(email);
 
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
-            TokenResetarSenha tokenResetarSenha = new TokenResetarSenha(conta);
+            TokenTrocarSenha tokenResetarSenha = new TokenTrocarSenha(conta);
 
             tokenResetarSenhaRepository.save(tokenResetarSenha);
 
-            Mail mail = new Mail("", "Requisição de mudança de senha", conta.getEmail());
-            sendMailAdapter.sendMail(mail);
+            eventPublisher.fire(RequestChangePasswordEvents.createRequestChangePasswordEvents(tokenResetarSenha));
         }
     }
 
-    public Optional<Conta> getContabyTokenResetarSenha(UUID tokenId) {
-        Optional<TokenResetarSenha> optionalToken = tokenResetarSenhaRepository.findById(tokenId);
+    public Optional<Conta> getContabyTokenTrocarSenha(UUID uuid) {
+        Optional<TokenTrocarSenha> optionalToken = tokenResetarSenhaRepository.findByUuid(uuid);
 
         if (optionalToken.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+            throw TokenInvalidException.invalidToken();
         }
 
-        TokenResetarSenha token = optionalToken.get();
+        TokenTrocarSenha token = optionalToken.get();
 
-        if (token.isUsado() || token.hasExpired()) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+        if (token.isInvalido() || token.hasExpired()) {
+            throw TokenInvalidException.invalidToken();
         }
 
         return Optional.of(token.getConta());
     }
 
     @Transactional
-    public void trocarSenha(UUID contaUuid, String senha, UUID tokenId) {
+    public void trocarSenha(UUID contaUuid, String senha, UUID tokenUuid) {
 
-        Optional<TokenResetarSenha> optionalToken = tokenResetarSenhaRepository.findById(tokenId);
+        Optional<TokenTrocarSenha> optionalToken = tokenResetarSenhaRepository.findByUuid(tokenUuid);
 
         if (optionalToken.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+            throw TokenInvalidException.invalidToken();
         }
 
-        TokenResetarSenha token = optionalToken.get();
+        TokenTrocarSenha token = optionalToken.get();
 
         Conta conta = token.getConta();
 
-        if (token.isUsado() || !conta.getUuid().equals(contaUuid) || token.hasExpired()) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+        if (token.isInvalido() || !conta.getUuid().equals(contaUuid) || token.hasExpired()) {
+            throw TokenInvalidException.invalidToken();
         }
 
         String encode = passwordEncoder.encode(senha);
@@ -115,7 +115,7 @@ public class ContaService {
 
         contaRepository.save(conta);
 
-        token.usar();
+        token.invalidar();
 
         tokenResetarSenhaRepository.save(token);
     }
