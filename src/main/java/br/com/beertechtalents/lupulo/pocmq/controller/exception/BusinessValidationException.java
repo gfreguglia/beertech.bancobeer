@@ -1,19 +1,19 @@
 package br.com.beertechtalents.lupulo.pocmq.controller.exception;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BusinessValidationException extends RuntimeException {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public BusinessValidationException(String... details) {
+    public BusinessValidationException(String... details) {
         super(BusinessValidationException.generateMessage(details));
     }
 
-    public BusinessValidationException(ArrayList<String> details) {
+    public BusinessValidationException(List<String> details) {
         super(BusinessValidationException.generateMessage(details));
     }
 
@@ -21,7 +21,7 @@ public class BusinessValidationException extends RuntimeException {
         return String.join(".\n", searchParams);
     }
 
-    private static String generateMessage(ArrayList<String> searchParams) {
+    private static String generateMessage(List<String> searchParams) {
         return String.join(".\n", searchParams);
     }
 }

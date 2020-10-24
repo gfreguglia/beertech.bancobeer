@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-public abstract class OperationEvents {
-    public static OutboxEvent createDepositEvent(Operacao operacao) {
+public interface OperationEvents {
+
+    static OutboxEvent createDepositEvent(Operacao operacao) {
         NotifyDeposit notifyDeposit = new NotifyDeposit(operacao);
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

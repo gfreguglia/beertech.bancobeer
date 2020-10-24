@@ -3,7 +3,6 @@ package br.com.beertechtalents.lupulo.pocmq.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -56,9 +55,9 @@ public class Conta implements Serializable {
     private Timestamp criadoEm;
 
     @OneToMany(mappedBy = "conta")
-    List<Operacao> operacoes = new ArrayList<>();
+    private List<Operacao> operacoes = new ArrayList<>();
 
-    public Collection<? extends GrantedAuthority> getAuthorities(){
+    public Collection<GrantedAuthority> getAuthorities() {
         GrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(uuid.toString());
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);

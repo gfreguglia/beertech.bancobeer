@@ -20,7 +20,7 @@ import javax.validation.Payload;
 @Documented
 public @interface ValueOfEnum {
 
-  Class<? extends Enum<?>> enumClass();
+  Class<? extends Enum> enumClass();
 
   String message() default "";
 

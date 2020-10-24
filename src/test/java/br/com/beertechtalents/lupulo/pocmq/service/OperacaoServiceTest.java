@@ -3,6 +3,7 @@ package br.com.beertechtalents.lupulo.pocmq.service;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -44,7 +45,7 @@ class OperacaoServiceTest {
         op.setValor(BigDecimal.valueOf(10.0));
         op.setTipo(Operacao.TipoTransacao.DEPOSITO);
         op.setConta(conta);
-        operacaoService.salvarOperacao(op);
+        Assertions.assertDoesNotThrow(() -> operacaoService.salvarOperacao(op));
     }
 
     @Test

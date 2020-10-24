@@ -62,8 +62,8 @@ public class ContaController {
 
         Conta conta = contaService.getConta(uuid).orElseThrow(() -> new EntityNotFoundException(Conta.class, "UUID: %s", uuid));
 
-        dto.getCnpj().ifPresent(s -> conta.setCnpj(s));
-        dto.getNome().ifPresent(s -> conta.setNome(s));
+        dto.getCnpj().ifPresent(conta::setCnpj);
+        dto.getNome().ifPresent(conta::setNome);
         dto.getPassword().ifPresent(s -> conta.setSenha(passwordEncoder.encode(s)));
 
         contaService.salvar(conta);
@@ -174,15 +174,15 @@ public class ContaController {
 
     @ApiOperation("Envia um email link para de redifinir senha")
     @PostMapping("/pedido-resetar-senha")
-    public ResponseEntity<?> requestTrocarSenha(@ApiParam("Email da conta") @RequestBody @Email String email) {
+    public ResponseEntity<Void> requestTrocarSenha(@ApiParam("Email da conta") @RequestBody @Email String email) {
 
         contaService.sendRequestTrocarSenha(email);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @ApiOperation("Pega a conta do token de resetar senha")
     @PostMapping("/conta-by-token-restar-senha")
-    public ResponseEntity<?>getContabyTokenResetarSenha(@ApiParam("Token de reset de senha") @RequestBody UUID tokenUuid) {
+    public ResponseEntity<ConsultaContaDTO> getContabyTokenResetarSenha(@ApiParam("Token de reset de senha") @RequestBody UUID tokenUuid) {
 
         Optional<Conta> optionalConta = contaService.getContabyTokenTrocarSenha(tokenUuid);
 
@@ -198,10 +198,10 @@ public class ContaController {
 
     @ApiOperation("Troca a senha da conta")
     @PostMapping("/{uuid}/trocar-senha")
-    public ResponseEntity<?>trocarSenha(@PathVariable UUID uuid,
-                                        @ApiParam("Nova senha e token de resetar senha") @RequestBody PatchTrocarSenhaDTO trocarSenhaDTO) {
+    public ResponseEntity<Void> trocarSenha(@PathVariable UUID uuid,
+                                            @ApiParam("Nova senha e token de resetar senha") @RequestBody PatchTrocarSenhaDTO trocarSenhaDTO) {
 
         contaService.trocarSenha(uuid, trocarSenhaDTO.getSenha(), trocarSenhaDTO.getToken());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

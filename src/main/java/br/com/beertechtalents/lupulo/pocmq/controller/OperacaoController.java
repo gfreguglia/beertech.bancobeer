@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -45,7 +44,7 @@ public class OperacaoController {
             @ApiResponse(code = 405, message = "Invalid input")})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     @PreAuthorize("hasAuthority(#dto.conta.toString())")
-    public ResponseEntity<?> novaOperacao(@RequestBody @Valid NovaOperacaoDTO dto) {
+    public ResponseEntity<Void> novaOperacao(@RequestBody @Valid NovaOperacaoDTO dto) {
 
         // Normalizar entrada
         dto.setValor(dto.getValor().abs());
@@ -68,12 +67,7 @@ public class OperacaoController {
             op.setDescricaoOperacao(Operacao.DescricaoOperacao.SAQUE);
         }
 
-        try {
-            operacaoService.salvarOperacao(op);
-        } catch (HttpClientErrorException ex) {
-            return new ResponseEntity<>(ex.getStatusText(), ex.getStatusCode());
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        operacaoService.salvarOperacao(op);
+        return ResponseEntity.noContent().build();
     }
 }
