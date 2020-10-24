@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +29,8 @@ public class ContaService {
     TokenResetarSenhaRepository tokenResetarSenhaRepository;
 
     SendMailAdapter sendMailAdapter;
+
+    private static final String INVALID_TOKEN_MESSAGE = "";
 
     public Page<Conta> getPageConta(int page, int size) {
         return contaRepository.findAll(PageRequest.of(page, size));
@@ -77,15 +80,44 @@ public class ContaService {
         Optional<TokenResetarSenha> optionalToken = tokenResetarSenhaRepository.findById(tokenId);
 
         if (optionalToken.isEmpty()) {
-            return Optional.empty();
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
         }
 
         TokenResetarSenha token = optionalToken.get();
 
-        if (token.hasExpired()) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Token expirado");
+        if (token.isUsado() || token.hasExpired()) {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
         }
 
         return Optional.of(token.getConta());
     }
+
+    @Transactional
+    public void trocarSenha(UUID contaUuid, String senha, UUID tokenId) {
+
+        Optional<TokenResetarSenha> optionalToken = tokenResetarSenhaRepository.findById(tokenId);
+
+        if (optionalToken.isEmpty()) {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+        }
+
+        TokenResetarSenha token = optionalToken.get();
+
+        Conta conta = token.getConta();
+
+        if (token.isUsado() || !conta.getUuid().equals(contaUuid) || token.hasExpired()) {
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+        }
+
+        String encode = passwordEncoder.encode(senha);
+
+        conta.setSenha(encode);
+
+        contaRepository.save(conta);
+
+        token.usar();
+
+        tokenResetarSenhaRepository.save(token);
+    }
+
 }

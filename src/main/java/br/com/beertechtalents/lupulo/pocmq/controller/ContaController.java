@@ -4,6 +4,7 @@ import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaExtratoDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaContaDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.PatchTrocarSenhaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
@@ -173,6 +174,14 @@ public class ContaController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
 
+    @ApiOperation("Troca a senha da conta")
+    @PatchMapping("/{id}")
+    public ResponseEntity<?>trocarSenha(@PathVariable UUID uuid,
+                                        @ApiParam("Nova senha e token de resetar senha") @RequestBody PatchTrocarSenhaDTO trocarSenhaDTO) {
+
+        contaService.trocarSenha(uuid, trocarSenhaDTO.getSenha(), trocarSenhaDTO.getToken());
+        return ResponseEntity.ok().build();
     }
 }
