@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Service
@@ -69,8 +71,36 @@ public class OperacaoService {
         return operacaoRepository.findByContaUuidOrderByDatahoraDesc(uuid, PageRequest.of(page, size));
     }
 
-    public Page<Operacao> getPageExtrato(UUID uuid, Timestamp inicio, Timestamp fim, int page, int size) {
+    public Page<Operacao> getPageExtrato(UUID uuid, LocalDate inicio, LocalDate fim, int page, int size) {
+
+
+        Timestamp inicioQuery = getInicioQuery(inicio);
+        Timestamp fimQuery = getFimQuery(fim);
+
+        if (inicioQuery.after(fimQuery)) {
+            throw new BusinessValidationException("A data de inicio nao pode ser maior que a data de fim");
+        }
+
         Pageable pageable = PageRequest.of(page, size);
-        return operacaoRepository.findByContaUuidAndDatahoraBetweenOrderByDatahoraDesc(uuid, inicio, fim, pageable);
+        return operacaoRepository.findByContaUuidAndDatahoraBetweenOrderByDatahoraDesc(uuid, inicioQuery, fimQuery, pageable);
+    }
+
+
+    private Timestamp getInicioQuery(LocalDate inicio) {
+        Timestamp inicioQuery;
+
+        if (inicio == null) {
+            inicio = LocalDate.now().minusDays(15);
+        }
+        return Timestamp.valueOf(inicio.atStartOfDay());
+    }
+
+    private Timestamp getFimQuery(LocalDate fim) {
+        Timestamp inicioQuery;
+
+        if (fim == null) {
+            fim = LocalDate.now();
+        }
+        return Timestamp.valueOf(fim.atTime(LocalTime.MAX));
     }
 }

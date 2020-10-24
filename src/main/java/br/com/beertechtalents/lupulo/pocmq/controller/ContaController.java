@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -154,12 +156,15 @@ public class ContaController {
     @GetMapping(value = "/{uuid}/extrato", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getContas(
             @PathVariable UUID uuid,
-            @ApiParam("Data inicial do extrato") @RequestParam Timestamp inicio,
-            @ApiParam("Data final do extrato") @RequestParam Timestamp fim,
-            @ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
-            @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size
+            @ApiParam("Data inicial do extrato") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate inicio,
+            @ApiParam("Data final do extrato") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate fim,
+            @ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0)
+                    int page,
+            @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50)
+                    int size) {
 
-    ) {
         Page<ConsultaExtratoDTO> map = operacaoService.getPageExtrato(uuid, inicio, fim, page, size)
                 .map(operacao -> new ConsultaExtratoDTO(operacao.getId(),
                         operacao.getTipo(),
