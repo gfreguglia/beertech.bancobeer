@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -110,7 +111,7 @@ public class ContaController {
 
     @ApiOperation("Criar nova conta")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UUID> postConta(@RequestBody NovaContaDTO dto) {
+    public ResponseEntity<UUID> postConta(@Valid @RequestBody NovaContaDTO dto) {
         Conta conta = new Conta();
         conta.setNome(dto.getNome());
         conta.setEmail(dto.getEmail());
