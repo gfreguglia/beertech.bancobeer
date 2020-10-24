@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -20,13 +23,19 @@ public class TokenResetarSenha {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    @Column(nullable = false)
+    @NotNull
     private Timestamp expiraEm;
 
-    @Column(nullable = false)
+    @NotNull
+    @ManyToOne
+    @JoinColumn(
+            name = "conta_uuid",
+            referencedColumnName = "uuid",
+            columnDefinition = "BINARY(16)"
+    )
     private Conta conta;
 
-    @Column(nullable = false)
+    @NotNull
     private boolean usado;
 
     private final long TEMPO_PARA_EXPERIAR_EM_MINUTOS = 60;
