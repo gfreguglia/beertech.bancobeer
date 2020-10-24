@@ -82,16 +82,11 @@ public class ContaService {
     }
 
     public Optional<Conta> getContabyTokenTrocarSenha(UUID uuid) {
-        Optional<TokenTrocarSenha> optionalToken = tokenResetarSenhaRepository.findByUuid(uuid);
-
-        if (optionalToken.isEmpty()) {
-            throw TokenInvalidException.invalidToken();
-        }
-
-        TokenTrocarSenha token = optionalToken.get();
+        TokenTrocarSenha token = tokenResetarSenhaRepository.findByUuid(uuid)
+                .orElseThrow(() -> new TokenInvalidException("Token not found"));
 
         if (token.isInvalido() || token.hasExpired()) {
-            throw TokenInvalidException.invalidToken();
+            throw new TokenInvalidException("Token invalid");
         }
 
         return Optional.of(token.getConta());
