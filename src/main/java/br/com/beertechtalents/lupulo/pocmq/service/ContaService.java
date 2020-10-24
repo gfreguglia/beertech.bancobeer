@@ -31,6 +31,8 @@ public class ContaService {
 
     final EventPublisher eventPublisher;
 
+    final RequestChangePasswordEvents requestChangePasswordEvents;
+
     public Page<Conta> getPageConta(int page, int size) {
         return contaRepository.findAll(PageRequest.of(page, size));
     }
@@ -74,7 +76,7 @@ public class ContaService {
 
             tokenResetarSenhaRepository.save(tokenResetarSenha);
 
-            eventPublisher.fire(RequestChangePasswordEvents.createRequestChangePasswordEvents(tokenResetarSenha));
+            eventPublisher.fire(requestChangePasswordEvents.createRequestChangePasswordEvents(tokenResetarSenha));
         }
     }
 
