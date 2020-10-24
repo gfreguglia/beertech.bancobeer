@@ -57,7 +57,7 @@ public class OperacaoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         op.setConta(optionalConta.get());
-        op.setTipo(dto.getTipo());
+        op.setTipo(Operacao.TipoTransacao.valueOf(dto.getTipo().toUpperCase()));
         op.setValor(dto.getValor());
         if (!StringUtils.isEmpty(dto.getCategoria())) {
             op.setCategoria(Operacao.Categoria.valueOf(dto.getCategoria().toUpperCase()));
@@ -68,8 +68,6 @@ public class OperacaoController {
         } else {
             op.setDescricaoOperacao(Operacao.DescricaoOperacao.SAQUE);
         }
-
-
 
         operacaoService.salvarOperacao(op);
         return new ResponseEntity<>(HttpStatus.OK);
