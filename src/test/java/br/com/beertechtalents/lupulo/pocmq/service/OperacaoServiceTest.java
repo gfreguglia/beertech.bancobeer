@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +34,6 @@ class OperacaoServiceTest {
         conta.setEmail("conta@email.com");
         conta.setSenha("senha");
         conta.setCnpj("12345678901234");
-        conta.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta = contaRepository.save(conta);
     }
 

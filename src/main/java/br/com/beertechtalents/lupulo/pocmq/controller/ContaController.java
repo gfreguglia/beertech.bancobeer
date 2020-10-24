@@ -6,7 +6,6 @@ import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaContaDTO;
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.PatchTrocarSenhaDTO;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
-import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.service.OperacaoService;
 import io.swagger.annotations.Api;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +45,7 @@ public class ContaController {
     public ResponseEntity<Page<ConsultaContaDTO>> getContas(@ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
                                                             @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size) {
         Page<ConsultaContaDTO> map = contaService.getPageConta(page, size)
-                .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj()));
+                .map(conta -> new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj()));
 
         return ResponseEntity.ok(map);
     }
@@ -58,7 +58,7 @@ public class ContaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
         return ResponseEntity.ok(dto);
     }
 
@@ -73,7 +73,7 @@ public class ContaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
         return ResponseEntity.ok(dto);
     }
 
@@ -88,10 +88,11 @@ public class ContaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation(value = "Consulta saldo", response = ConsultaSaldoDTO.class)
     @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.APPLICATION_JSON_VALUE})
     public CompletableFuture<ResponseEntity<ConsultaSaldoDTO>> getSaldoConta(@PathVariable UUID uuid) {
@@ -116,12 +117,11 @@ public class ContaController {
         conta.setEmail(dto.getEmail());
         conta.setCnpj(dto.getCnpj());
         conta.setSenha(dto.getSenha());
-        conta.setPerfil(dto.getPerfil());
         conta = contaService.novaConta(conta);
         return ResponseEntity.ok(conta.getUuid());
     }
 
-
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation("Consulta paginada dos ultimos lancamentos")
     @GetMapping(value = "/{uuid}/operacao", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getOperacoes(
@@ -135,6 +135,7 @@ public class ContaController {
         return ResponseEntity.ok(map);
     }
 
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation("Consulta paginada dos extrato")
     @GetMapping(value = "/{uuid}/extrato", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getContas(
@@ -169,7 +170,7 @@ public class ContaController {
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
 
-            ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+            ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
             return ResponseEntity.ok(dto);
         } else {
             return ResponseEntity.notFound().build();

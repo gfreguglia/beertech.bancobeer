@@ -48,7 +48,7 @@ class ContaServiceTest {
 
 
     Conta conta1 = new Conta(1l, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
-            "wdf245l*iuga", Conta.PerfilUsuario.ADMIN, new Timestamp(100000), new ArrayList<>());
+            "wdf245l*iuga", new Timestamp(100000), new ArrayList<>());
 
     //@Test
     void getPageConta() {
@@ -56,25 +56,37 @@ class ContaServiceTest {
         assertThat(pageConta.getContent().get(0).getNome()).isEqualTo("CONTA");
     }
 
-    //@Test
+    @Test
     void novaConta() {
         Conta nova = new Conta();
         nova.setNome("NOVA CONTA");
         nova.setEmail("conta_nova@email.com");
         nova.setSenha("senha_nova");
-        nova.setCnpj("");
-        nova.setPerfil(Conta.PerfilUsuario.USER);
+        nova.setCnpj("11111111111111");
+
+
+        Mockito.when(contaRepository.save(Mockito.any(Conta.class))).then(i -> {
+            Conta contaBeforeSave = (Conta) i.getArguments()[0];
+            assertThat(contaBeforeSave.getSenha()).isEqualTo(passwordEncoder.encode("senha_nova"));
+            return contaBeforeSave;
+        });
+
         nova = contaService.novaConta(nova);
-        assertThat(nova.getId()).isGreaterThan(0);
+
+        assertThat(nova).isNotNull();
     }
 
-    //@Test
-    void getConta() {
+    @Test
+    void getContaUuid() {
+
+        Mockito.when(contaRepository.findByUuid(Mockito.any(UUID.class))).then(i -> Optional.of(conta1));
+
         Optional<Conta> conta = contaService.getConta(conta1.getUuid());
+
         assertThat(conta.isPresent()).isTrue();
     }
 
-    //@Test
+    @Test
     void computeSaldo() {
         assertThat(contaService.computeSaldo(conta1)).isEqualTo(BigDecimal.valueOf(0.0));
     }

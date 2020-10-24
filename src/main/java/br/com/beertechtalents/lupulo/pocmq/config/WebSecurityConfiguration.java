@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -54,17 +53,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable();
-        httpSecurity.cors().disable();
+        httpSecurity.cors();
 
         // Não cheque essas requisições
         httpSecurity
-                .authorizeRequests().antMatchers("/authenticate","/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/conta").permitAll().
+                .authorizeRequests()
+                .antMatchers("/authenticate", "/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**", "/h2-console").permitAll()
+                .antMatchers(HttpMethod.POST, "/conta").permitAll();
 
         // Qualquer outra requisição deve ser checada
-        anyRequest().authenticated().and().
-                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.authorizeRequests().anyRequest().authenticated();
+        httpSecurity.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
