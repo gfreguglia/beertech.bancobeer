@@ -1,5 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.controller.exception;
 
+import br.com.beertechtalents.lupulo.pocmq.exception.TokenInvalidException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.core.Ordered;
@@ -203,7 +204,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
                                                                       WebRequest request) {
         ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
+        Class<?> requiredType = ex.getRequiredType();
+        String simpleName = "unknown";
+        if (requiredType != null) {
+            simpleName = requiredType.getSimpleName();
+        }
+        apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), simpleName));
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
@@ -216,15 +222,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex){
+    protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
         ApiError apiError = new ApiError(UNAUTHORIZED);
         apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(TokenInvalidException.class)
+    protected ResponseEntity<Object> handleTokenInvalidException(TokenInvalidException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage(ex.getLocalizedMessage());
         return buildResponseEntity(apiError);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(apiError, headers,apiError.getStatus());
+        return new ResponseEntity<>(apiError, headers, apiError.getStatus());
     }
 }

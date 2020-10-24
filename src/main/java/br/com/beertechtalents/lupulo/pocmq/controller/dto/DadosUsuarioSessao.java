@@ -1,5 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.controller.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Getter
+@EqualsAndHashCode
 public class DadosUsuarioSessao extends User {
     final String email;
     final String nome;

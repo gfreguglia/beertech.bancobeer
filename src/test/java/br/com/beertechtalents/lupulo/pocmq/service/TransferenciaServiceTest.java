@@ -57,8 +57,7 @@ class TransferenciaServiceTest {
         BigDecimal saldo1 = contaService.computeSaldo(conta1);
         BigDecimal saldo2 = contaService.computeSaldo(conta2);
 
-        assertThat(saldo1.compareTo(new BigDecimal("90.0"))).isEqualTo(0);
-        assertThat(saldo2.compareTo(new BigDecimal("10.0"))).isEqualTo(0);
-
+        assertThat(saldo1).isEqualByComparingTo(new BigDecimal("90.0"));
+        assertThat(saldo2).isEqualByComparingTo(new BigDecimal("10.0"));
     }
 }

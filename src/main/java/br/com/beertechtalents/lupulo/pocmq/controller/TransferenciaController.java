@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/transferencia")
@@ -28,17 +25,9 @@ public class TransferenciaController {
     @PostMapping
     @ApiOperation(value = "Realizar transferencia")
     @PreAuthorize("hasAuthority(#dto.origem.toString())")
-    public CompletableFuture<?> novaTransferencia(@RequestBody NovaTransferenciaDTO dto) {
-
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                transferenciaService.transferir(dto.getOrigem(), dto.getDestino(), dto.getValor());
-            } catch (HttpClientErrorException ex) {
-                return new ResponseEntity<>(ex.getStatusText(), ex.getStatusCode());
-            }
-
-            return ResponseEntity.noContent().build();
-        });
+    public ResponseEntity<Void> novaTransferencia(@RequestBody NovaTransferenciaDTO dto) {
+        transferenciaService.transferir(dto.getOrigem(), dto.getDestino(), dto.getValor());
+        return ResponseEntity.noContent().build();
 
     }
 }

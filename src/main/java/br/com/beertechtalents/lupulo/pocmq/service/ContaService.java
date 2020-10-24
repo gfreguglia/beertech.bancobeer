@@ -7,8 +7,6 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
-import java.util.Collections;
-import java.util.Comparator;
 import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,11 +43,10 @@ public class ContaService {
     }
 
     public BigDecimal computeSaldo(Conta conta) {
-        BigDecimal saldo = conta.getOperacoes().stream()
-            .max(Comparator.comparing(Operacao::getId))
-            .map(Operacao::getSaldoAtual)
-            .orElse(BigDecimal.ZERO);
-        return saldo;
+        return conta.getOperacoes().stream()
+                .max(Comparator.comparing(Operacao::getId))
+                .map(Operacao::getSaldoAtual)
+                .orElse(BigDecimal.ZERO);
     }
 
     public Optional<Conta> findByEmail(String email) {
@@ -82,16 +80,11 @@ public class ContaService {
     }
 
     public Optional<Conta> getContabyTokenTrocarSenha(UUID uuid) {
-        Optional<TokenTrocarSenha> optionalToken = tokenResetarSenhaRepository.findByUuid(uuid);
-
-        if (optionalToken.isEmpty()) {
-            throw TokenInvalidException.invalidToken();
-        }
-
-        TokenTrocarSenha token = optionalToken.get();
+        TokenTrocarSenha token = tokenResetarSenhaRepository.findByUuid(uuid)
+                .orElseThrow(() -> new TokenInvalidException("Token not found"));
 
         if (token.isInvalido() || token.hasExpired()) {
-            throw TokenInvalidException.invalidToken();
+            throw new TokenInvalidException("Token invalid");
         }
 
         return Optional.of(token.getConta());

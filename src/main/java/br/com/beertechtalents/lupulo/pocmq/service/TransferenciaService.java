@@ -20,7 +20,7 @@ public class TransferenciaService {
     OperacaoService operacaoService;
 
     @Transactional
-    public void transferir(UUID origem, UUID destino, BigDecimal valor) throws HttpClientErrorException {
+    public void transferir(UUID origem, UUID destino, BigDecimal valor) {
         Optional<Conta> optionalContaOrigem = contaService.getConta(origem);
         if(optionalContaOrigem.isEmpty()) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta origem não encontrada.");

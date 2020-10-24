@@ -1,5 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.EntityNotFoundException;
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OperationEvents;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
@@ -32,7 +33,8 @@ public class OperacaoService {
 
     @Transactional
     public void salvarOperacao(Operacao operacao) {
-        Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid()).get();
+        Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid())
+                .orElseThrow(() -> new EntityNotFoundException(Conta.class, "UUID: %s", operacao.getConta().getUuid()));
         final BigDecimal saldo = contaService.computeSaldo(conta);
         switch (operacao.getTipo()) {
             case SAQUE:

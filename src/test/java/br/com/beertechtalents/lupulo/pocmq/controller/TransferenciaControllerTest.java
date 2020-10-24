@@ -63,7 +63,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    public void transferShouldReturnSuccess() {
+    void transferShouldReturnSuccess() {
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost")
                 .port(port)
@@ -83,7 +83,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    public void transferOnUnknownOriginAccountShouldReturnError() {
+    void transferOnUnknownOriginAccountShouldReturnError() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost")
                 .port(port)
                 .path("/transferencia")
@@ -96,7 +96,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    public void transferOnUnknownDestinationAccountShouldReturnError() {
+    void transferOnUnknownDestinationAccountShouldReturnError() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost")
                 .port(port)
                 .path("/transferencia")

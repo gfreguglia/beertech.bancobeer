@@ -2,7 +2,7 @@ package br.com.beertechtalents.lupulo.pocmq.exception;
 
 public class TokenInvalidException extends RuntimeException {
 
-    private TokenInvalidException(String message) {
+    public TokenInvalidException(String message) {
         super(message);
     }
 

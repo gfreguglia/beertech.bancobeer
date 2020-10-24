@@ -3,7 +3,6 @@ package br.com.beertechtalents.lupulo.pocmq.controller.dto;
 import br.com.beertechtalents.lupulo.pocmq.validators.NullOrNotEmpty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Optional;
 
