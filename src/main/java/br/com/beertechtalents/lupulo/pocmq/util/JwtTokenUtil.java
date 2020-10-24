@@ -60,7 +60,7 @@ public class JwtTokenUtil implements Serializable {
             claims.put("email", dadosUsuarioSessao.getEmail());
             claims.put("nome", dadosUsuarioSessao.getNome());
             claims.put("cnpj", dadosUsuarioSessao.getCnpj());
-            claims.put("perfil", dadosUsuarioSessao.getPerfil());
+            claims.put("uuid", dadosUsuarioSessao.getUuid());
             return doGenerateToken(claims, dadosUsuarioSessao.getUsername());
         } else {
             throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);

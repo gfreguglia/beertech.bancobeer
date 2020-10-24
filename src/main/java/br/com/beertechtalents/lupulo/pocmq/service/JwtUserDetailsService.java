@@ -22,7 +22,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
-            return new DadosUsuarioSessao(login, "", conta.getAuthorities(), conta.getEmail(), conta.getNome(), conta.getCnpj(), conta.getPerfil());
+            return new DadosUsuarioSessao(login, "", conta.getAuthorities(), conta.getEmail(), conta.getNome(), conta.getCnpj(), conta.getUuid());
         } else {
             return null;
         }
