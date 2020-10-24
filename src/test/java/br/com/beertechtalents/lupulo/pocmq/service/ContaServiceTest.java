@@ -2,6 +2,7 @@ package br.com.beertechtalents.lupulo.pocmq.service;
 
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OutboxEvent;
+import br.com.beertechtalents.lupulo.pocmq.events.RequestChangePasswordEvents;
 import br.com.beertechtalents.lupulo.pocmq.exception.TokenInvalidException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
@@ -45,17 +46,8 @@ class ContaServiceTest {
     @Mock
     EventPublisher eventPublisher;
 
-    @BeforeAll
-    void setUp() {
-        conta1.setNome("CONTA");
-        conta1.setEmail("conta@email.com");
-        conta1.setSenha("senha");
-        conta1.setCnpj("11111111111111");
-        conta1 = contaRepository.save(conta1);
-    }
-
     @Mock
-    TokenTrocarSenha tokenTrocarSenhaMock;
+    RequestChangePasswordEvents requestChangePasswordEvents;
 
 
     Conta conta1 = new Conta(1l, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
@@ -77,11 +69,10 @@ class ContaServiceTest {
 
         Mockito.when(contaRepository.save(Mockito.any(Conta.class))).then(i -> {
             Conta contaBeforeSave = (Conta) i.getArguments()[0];
-            assertThat(contaBeforeSave.getSenha()).isEqualTo(passwordEncoder.encode("senha_nova"));
             return contaBeforeSave;
         });
 
-        nova = contaService.novaConta(nova);
+        nova = contaService.salvar(nova);
 
         assertThat(nova).isNotNull();
     }
@@ -130,13 +121,10 @@ class ContaServiceTest {
                     return mockToken;
                 });
 
-        Mockito.doAnswer(i -> {
-            OutboxEvent event = (OutboxEvent) i.getArguments()[0];
 
-            assertThat(event.getAggregateId()).isEqualTo(tokenId);
-
-            return null;
-        }).when(eventPublisher).fire(Mockito.any(OutboxEvent.class));
+        Mockito.when(requestChangePasswordEvents.createRequestChangePasswordEvents(Mockito.any(TokenTrocarSenha.class))).
+                then(i -> new OutboxEvent(1l, null, null));
+        Mockito.doNothing().when(eventPublisher).fire(Mockito.any(OutboxEvent.class));
 
 
         contaService.sendRequestTrocarSenha("email");

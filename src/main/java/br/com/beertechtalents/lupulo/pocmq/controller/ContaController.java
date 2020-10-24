@@ -195,7 +195,7 @@ public class ContaController {
     }
 
     @ApiOperation("Troca a senha da conta")
-    @PatchMapping("/{uuid}")
+    @PostMapping("/{uuid}/trocar-senha")
     public ResponseEntity<?>trocarSenha(@PathVariable UUID uuid,
                                         @ApiParam("Nova senha e token de resetar senha") @RequestBody PatchTrocarSenhaDTO trocarSenhaDTO) {
 

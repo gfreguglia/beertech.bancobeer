@@ -19,6 +19,6 @@ public class RequestChangePasswordEvents {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         JsonNode jsonNode = mapper.convertValue(notifyRequestResetPassword, JsonNode.class);
-        return new OutboxEvent(token.getId(), "MAIL", jsonNode);
+        return new OutboxEvent(token.getId(), NotifyRequestResetPassword.class, jsonNode);
     }
 }

@@ -34,8 +34,8 @@ class TransferenciaServiceTest {
         conta1.setNome("ORIGEM");
         conta2.setNome("DESTINO");
 
-        conta1 = contaService.novaConta(conta1);
-        conta2 = contaService.novaConta(conta2);
+        conta1 = contaService.salvar(conta1);
+        conta2 = contaService.salvar(conta2);
 
         Operacao op = new Operacao();
         op.setConta(conta1);
