@@ -7,20 +7,23 @@ import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.service.OperacaoService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Optional;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/operacao")
@@ -33,10 +36,17 @@ public class OperacaoController {
     ContaService contaService;
 
     @ApiOperation(value = "Adiciona uma nova operacao", nickname = "POST")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            required = true,
+            dataTypeClass = String.class,
+            name = "Authorization",
+            paramType = "header")
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 405, message = "Invalid input")})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<?> novaOperacao(@RequestBody NovaOperacaoDTO dto) {
+    public ResponseEntity<?> novaOperacao(@RequestBody @Valid NovaOperacaoDTO dto) {
 
         // Normalizar entrada
         dto.setValor(dto.getValor().abs());
@@ -47,8 +57,11 @@ public class OperacaoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         op.setConta(optionalConta.get());
-        op.setTipo(dto.getTipo());
+        op.setTipo(Operacao.TipoTransacao.valueOf(dto.getTipo().toUpperCase()));
         op.setValor(dto.getValor());
+        if (!StringUtils.isEmpty(dto.getCategoria())) {
+            op.setCategoria(Operacao.Categoria.valueOf(dto.getCategoria().toUpperCase()));
+        }
 
         if (op.getTipo().equals(Operacao.TipoTransacao.DEPOSITO)) {
             op.setDescricaoOperacao(Operacao.DescricaoOperacao.DEPOSITO);
