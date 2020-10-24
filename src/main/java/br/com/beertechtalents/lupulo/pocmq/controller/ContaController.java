@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,6 +91,7 @@ public class ContaController {
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation(value = "Consulta saldo", response = ConsultaSaldoDTO.class)
     @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.APPLICATION_JSON_VALUE})
     public CompletableFuture<ResponseEntity<ConsultaSaldoDTO>> getSaldoConta(@PathVariable UUID uuid) {
@@ -118,7 +120,7 @@ public class ContaController {
         return ResponseEntity.ok(conta.getUuid());
     }
 
-
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation("Consulta paginada dos ultimos lancamentos")
     @GetMapping(value = "/{uuid}/operacao", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getOperacoes(
@@ -132,6 +134,7 @@ public class ContaController {
         return ResponseEntity.ok(map);
     }
 
+    @PreAuthorize("hasAuthority(#uuid.toString())")
     @ApiOperation("Consulta paginada dos extrato")
     @GetMapping(value = "/{uuid}/extrato", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getContas(
