@@ -35,7 +35,7 @@ class OperacaoServiceTest {
         conta.setNome("CONTA");
         conta.setEmail("conta@email.com");
         conta.setSenha("senha");
-        conta.setCnpj(BigInteger.TEN);
+        conta.setCnpj("12345678901234");
         conta.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta = contaRepository.save(conta);
     }

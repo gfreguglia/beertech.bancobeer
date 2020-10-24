@@ -150,4 +150,29 @@ public class ContaController {
 
         return ResponseEntity.ok(map);
     }
+
+    @ApiOperation("Envia um email link para de redifinir senha")
+    @PostMapping("/pedido-resetar-senha")
+    public ResponseEntity<?> requestResetarSenha(@ApiParam("Email da conta") @RequestBody @Email String email) {
+
+        contaService.sendRequestResetarSenha(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("Pega a conta do token de resetar senha")
+    @PostMapping("/conta-by-token-restar-senha")
+    public ResponseEntity<?>getContabyTokenResetarSenha(@ApiParam("Token de reset de senha") @RequestBody UUID tokenId) {
+
+        Optional<Conta> optionalConta = contaService.getContabyTokenResetarSenha(tokenId);
+
+        if (optionalConta.isPresent()) {
+            Conta conta = optionalConta.get();
+
+            ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getPerfil(), conta.getEmail(), conta.getCnpj());
+            return ResponseEntity.ok(dto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
 }

@@ -1,6 +1,8 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @Data
 @EntityListeners(AuditingEntityListener.class)
 @Validated
+@AllArgsConstructor
+@NoArgsConstructor
 public class Conta implements Serializable {
 
     @Id
