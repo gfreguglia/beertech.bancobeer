@@ -62,11 +62,11 @@ public class ContaController {
     }
 
     @ApiOperation("Consulta de conta por email")
-    @GetMapping(params = "email",produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(params = "email", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ConsultaContaDTO> getContaPorEmail(
             @ApiParam("Email da conta") @RequestParam(required = true) @Email String email) {
 
-        Optional<Conta> optionalConta= contaService.findByEmail(email);
+        Optional<Conta> optionalConta = contaService.findByEmail(email);
 
         if (optionalConta.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -77,7 +77,7 @@ public class ContaController {
     }
 
     @ApiOperation("Consulta de conta por cnpj")
-    @GetMapping(params = "cnpj",produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(params = "cnpj", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ConsultaContaDTO> getContaPorCnpj(
             @ApiParam("Cnpj da conta") @RequestParam(required = false) String cnpj) {
 
@@ -128,8 +128,12 @@ public class ContaController {
             @ApiParam("Indice da pagina requisitada") @RequestParam(defaultValue = "0", required = false) @Min(0) int page,
             @ApiParam("Numero de elementos por pagina") @RequestParam(defaultValue = "25", required = false) @Min(10) @Max(50) int size) {
         Page<ConsultaExtratoDTO> map = operacaoService.getPageOperacao(uuid, page, size)
-                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(),
-                        operacao.getDescricaoOperacao(), operacao.getValor(), operacao.getCategoria() != null ? operacao.getCategoria().toString() : null));
+                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(),
+                        operacao.getTipo(),
+                        operacao.getDescricaoOperacao(),
+                        operacao.getValor(),
+                        operacao.getCategoria() != null ? operacao.getCategoria().toString() : null,
+                        operacao.getDatahora()));
 
         return ResponseEntity.ok(map);
     }
@@ -146,8 +150,12 @@ public class ContaController {
 
     ) {
         Page<ConsultaExtratoDTO> map = operacaoService.getPageExtrato(uuid, inicio, fim, page, size)
-                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(), operacao.getTipo(),
-                        operacao.getDescricaoOperacao(), operacao.getValor(), operacao.getCategoria() != null ? operacao.getCategoria().toString() : null));
+                .map(operacao -> new ConsultaExtratoDTO(operacao.getId(),
+                        operacao.getTipo(),
+                        operacao.getDescricaoOperacao(),
+                        operacao.getValor(),
+                        operacao.getCategoria() != null ? operacao.getCategoria().toString() : null,
+                        operacao.getDatahora()));
 
         return ResponseEntity.ok(map);
     }

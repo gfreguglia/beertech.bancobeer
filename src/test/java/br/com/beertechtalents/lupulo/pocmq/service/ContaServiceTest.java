@@ -34,7 +34,6 @@ class ContaServiceTest {
         conta1.setEmail("conta@email.com");
         conta1.setSenha("senha");
         conta1.setCnpj("11111111111111");
-        conta1.setPerfil(Conta.PerfilUsuario.ADMIN);
         conta1 = contaRepository.save(conta1);
     }
 
@@ -51,7 +50,6 @@ class ContaServiceTest {
         nova.setEmail("conta_nova@email.com");
         nova.setSenha("senha_nova");
         nova.setCnpj("11111111111111");
-        nova.setPerfil(Conta.PerfilUsuario.USER);
         nova = contaService.novaConta(nova);
         assertThat(nova.getId()).isGreaterThan(0);
     }
