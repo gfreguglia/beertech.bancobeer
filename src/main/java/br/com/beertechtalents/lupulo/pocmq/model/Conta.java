@@ -1,7 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.model;
 
 import lombok.Data;
-import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -48,11 +47,6 @@ public class Conta implements Serializable {
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    @Setter
-    private PerfilUsuario perfil;
-
     @CreatedDate
     private Timestamp criadoEm;
 
@@ -60,15 +54,10 @@ public class Conta implements Serializable {
     List<Operacao> operacoes = new ArrayList<>();
 
     public Collection<? extends GrantedAuthority> getAuthorities(){
-        GrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(perfil.toString());
+        GrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(uuid.toString());
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);
         return authorities;
-    }
-
-    public enum PerfilUsuario {
-        ADMIN,
-        USER
     }
 
 }
