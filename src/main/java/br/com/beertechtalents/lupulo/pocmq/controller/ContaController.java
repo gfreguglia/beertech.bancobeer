@@ -1,9 +1,7 @@
 package br.com.beertechtalents.lupulo.pocmq.controller;
 
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaContaDTO;
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaExtratoDTO;
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.ConsultaSaldoDTO;
-import br.com.beertechtalents.lupulo.pocmq.controller.dto.NovaContaDTO;
+import br.com.beertechtalents.lupulo.pocmq.controller.dto.*;
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.EntityNotFoundException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.service.ContaService;
 import br.com.beertechtalents.lupulo.pocmq.service.OperacaoService;
@@ -16,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +36,8 @@ import java.util.concurrent.CompletableFuture;
 public class ContaController {
 
     ContaService contaService;
-
     OperacaoService operacaoService;
+    PasswordEncoder passwordEncoder;
 
     @ApiOperation("Consulta paginada de contas")
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -54,12 +53,23 @@ public class ContaController {
     @GetMapping("/{uuid}")
     public ResponseEntity<ConsultaContaDTO> getConta(@PathVariable UUID uuid) {
         Optional<Conta> optionalConta = contaService.getConta(uuid);
-        if (optionalConta.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
-        return ResponseEntity.ok(dto);
+        return getConsultaContaDTOResponseEntity(optionalConta);
+    }
+
+    @ApiOperation("Atualizar dados da conta")
+    @PatchMapping("/{uuid}")
+    public ResponseEntity<Void> patchConta(@PathVariable UUID uuid, @Valid @RequestBody AtualizarContaDTO dto) {
+
+        Conta conta = contaService.getConta(uuid).orElseThrow(() -> new EntityNotFoundException(Conta.class, "UUID: %s", uuid));
+
+        dto.getCnpj().ifPresent(s -> conta.setCnpj(s));
+        dto.getNome().ifPresent(s -> conta.setNome(s));
+        dto.getPassword().ifPresent(s -> conta.setSenha(passwordEncoder.encode(s)));
+
+        contaService.salvar(conta);
+
+        return ResponseEntity.noContent().build();
+
     }
 
     @ApiOperation("Consulta de conta por email")
@@ -69,6 +79,10 @@ public class ContaController {
 
         Optional<Conta> optionalConta = contaService.findByEmail(email);
 
+        return getConsultaContaDTOResponseEntity(optionalConta);
+    }
+
+    private ResponseEntity<ConsultaContaDTO> getConsultaContaDTOResponseEntity(Optional<Conta> optionalConta) {
         if (optionalConta.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -84,12 +98,7 @@ public class ContaController {
 
         Optional<Conta> optionalConta = contaService.findByCnpj(cnpj);
 
-        if (optionalConta.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Conta conta = optionalConta.get();
-        ConsultaContaDTO dto = new ConsultaContaDTO(conta.getUuid(), conta.getNome(), conta.getCriadoEm(), conta.getEmail(), conta.getCnpj());
-        return ResponseEntity.ok(dto);
+        return getConsultaContaDTOResponseEntity(optionalConta);
     }
 
     @PreAuthorize("hasAuthority(#uuid.toString())")
@@ -116,8 +125,8 @@ public class ContaController {
         conta.setNome(dto.getNome());
         conta.setEmail(dto.getEmail());
         conta.setCnpj(dto.getCnpj());
-        conta.setSenha(dto.getSenha());
-        conta = contaService.novaConta(conta);
+        conta.setSenha(passwordEncoder.encode(dto.getSenha()));
+        conta = contaService.salvar(conta);
         return ResponseEntity.ok(conta.getUuid());
     }
 

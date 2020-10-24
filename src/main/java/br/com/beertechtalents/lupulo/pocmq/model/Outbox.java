@@ -24,7 +24,7 @@ public class Outbox {
     private Long aggregateId;
 
     @Column(name = "EVENT_TYPE")
-    private String eventType;
+    private Class eventType;
 
     @Lob
     @Column(name = "PAYLOAD")

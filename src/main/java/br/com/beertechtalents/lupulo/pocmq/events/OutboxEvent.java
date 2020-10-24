@@ -9,6 +9,6 @@ import lombok.Data;
 public class OutboxEvent {
 
     private Long aggregateId;
-    private String eventType;
+    private Class<?> eventType;
     private JsonNode payload;
 }
