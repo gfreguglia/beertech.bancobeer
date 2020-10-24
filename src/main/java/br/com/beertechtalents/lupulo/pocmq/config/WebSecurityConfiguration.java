@@ -59,7 +59,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity
                 .authorizeRequests()
                 .antMatchers("/authenticate", "/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**", "/h2-console").permitAll()
-                .antMatchers(HttpMethod.POST, "/conta").permitAll();
+                .antMatchers(HttpMethod.POST, "/conta", "/conta/pedido-resetar-senha", "/conta/conta-by-token-restar-senha").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/conta/{\\d+}").permitAll();
 
         // Qualquer outra requisição deve ser checada
         httpSecurity.authorizeRequests().anyRequest().authenticated();
