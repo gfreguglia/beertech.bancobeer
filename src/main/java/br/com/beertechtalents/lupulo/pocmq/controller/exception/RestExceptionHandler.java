@@ -24,6 +24,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.security.SignatureException;
+
 import static org.springframework.http.HttpStatus.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -231,6 +233,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(TokenInvalidException.class)
     protected ResponseEntity<Object> handleTokenInvalidException(TokenInvalidException ex) {
         ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage(ex.getLocalizedMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    protected ResponseEntity<Object> handleSignatureException(SignatureException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage(ex.getLocalizedMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    protected ResponseEntity<Object> handleInternalServerErrorException(InternalServerErrorException ex) {
+        ApiError apiError = new ApiError(INTERNAL_SERVER_ERROR);
         apiError.setMessage(ex.getLocalizedMessage());
         return buildResponseEntity(apiError);
     }

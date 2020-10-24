@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Data;
 
+import javax.validation.constraints.Positive;
+
 @Data
 @JsonInclude(Include.NON_NULL)
 public class NovaOperacaoDTO {
@@ -19,6 +21,7 @@ public class NovaOperacaoDTO {
     @ApiModelProperty(notes = "Valid values:\n DEPOSITO \nSAQUE")
     private String tipo;
 
+    @Positive
     private BigDecimal valor;
 
     @ValueOfEnum(enumClass = Operacao.Categoria.class, message = "Categoria não permitida")

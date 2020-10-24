@@ -43,7 +43,7 @@ public class OperacaoController {
     @ApiResponses(value = {
             @ApiResponse(code = 405, message = "Invalid input")})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @PreAuthorize("hasAuthority(#dto.conta.toString())")
+    @PreAuthorize("hasAuthority(#dto.conta)")
     public ResponseEntity<Void> novaOperacao(@RequestBody @Valid NovaOperacaoDTO dto) {
 
         // Normalizar entrada

@@ -1,14 +1,13 @@
 package br.com.beertechtalents.lupulo.pocmq.util;
 
 import br.com.beertechtalents.lupulo.pocmq.controller.dto.DadosUsuarioSessao;
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.InternalServerErrorException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -53,7 +52,7 @@ public class JwtTokenUtil implements Serializable {
 
     //gera token para user
     public String generateToken(UserDetails userDetails) {
-        if(userDetails instanceof DadosUsuarioSessao) {
+        if (userDetails instanceof DadosUsuarioSessao) {
             DadosUsuarioSessao dadosUsuarioSessao = (DadosUsuarioSessao) userDetails;
 
             Map<String, Object> claims = new HashMap<>();
@@ -63,7 +62,7 @@ public class JwtTokenUtil implements Serializable {
             claims.put("uuid", dadosUsuarioSessao.getUuid());
             return doGenerateToken(claims, dadosUsuarioSessao.getUsername());
         } else {
-            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InternalServerErrorException("Unexpected state handling user credentials");
         }
     }
 
