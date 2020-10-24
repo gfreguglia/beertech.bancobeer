@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -67,7 +68,12 @@ public class OperacaoController {
             op.setDescricaoOperacao(Operacao.DescricaoOperacao.SAQUE);
         }
 
-        operacaoService.salvarOperacao(op);
+        try {
+            operacaoService.salvarOperacao(op);
+        } catch (HttpClientErrorException ex) {
+            return new ResponseEntity<>(ex.getStatusText(), ex.getStatusCode());
+        }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
