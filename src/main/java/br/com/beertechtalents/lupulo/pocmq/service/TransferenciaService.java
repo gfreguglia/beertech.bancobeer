@@ -1,11 +1,10 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.EntityNotFoundException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -22,8 +21,8 @@ public class TransferenciaService {
     @Transactional
     public void transferir(UUID origem, UUID destino, BigDecimal valor) {
         Optional<Conta> optionalContaOrigem = contaService.getConta(origem);
-        if(optionalContaOrigem.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta origem não encontrada.");
+        if (optionalContaOrigem.isEmpty()) {
+            throw new EntityNotFoundException(Conta.class, "uuid", origem);
         }
 
         Operacao op = new Operacao();
@@ -34,8 +33,8 @@ public class TransferenciaService {
         operacaoService.salvarOperacao(op);
 
         Optional<Conta> optionalContaDestino = contaService.getConta(destino);
-        if(optionalContaDestino.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Conta destino não encontrada.");
+        if (optionalContaDestino.isEmpty()) {
+            throw new EntityNotFoundException(Conta.class, "uuid", destino);
         }
 
         op = new Operacao();

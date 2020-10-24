@@ -1,5 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.BusinessValidationException;
 import br.com.beertechtalents.lupulo.pocmq.controller.exception.EntityNotFoundException;
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OperationEvents;
@@ -7,17 +8,15 @@ import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.repository.OperacaoRepository;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -31,6 +30,7 @@ public class OperacaoService {
     final ContaService contaService;
     final EventPublisher eventPublisher;
 
+
     @Transactional
     public void salvarOperacao(Operacao operacao) {
         Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid())
@@ -43,14 +43,14 @@ public class OperacaoService {
                     salvarSaque(operacao);
                     break;
                 } else {
-                    throw new HttpClientErrorException(HttpStatus.PRECONDITION_FAILED, "Insufficient funds");
+                    throw new BusinessValidationException("Insufficient funds");
                 }
             case DEPOSITO:
                 operacao.setSaldoAtual(saldo.add(operacao.getValor()));
                 salvarDeposito(operacao);
                 break;
             default:
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid operation type");
+                throw new BusinessValidationException("Invalid operation type");
         }
 
     }

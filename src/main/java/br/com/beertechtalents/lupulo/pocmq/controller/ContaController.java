@@ -101,7 +101,7 @@ public class ContaController {
         return getConsultaContaDTOResponseEntity(optionalConta);
     }
 
-    @PreAuthorize("hasAuthority(#uuid.toString())")
+    @PreAuthorize("hasAuthority(#uuid)")
     @ApiOperation(value = "Consulta saldo", response = ConsultaSaldoDTO.class)
     @GetMapping(value = "/{uuid}/saldo", produces = {MediaType.APPLICATION_JSON_VALUE})
     public CompletableFuture<ResponseEntity<ConsultaSaldoDTO>> getSaldoConta(@PathVariable UUID uuid) {
@@ -130,7 +130,7 @@ public class ContaController {
         return ResponseEntity.ok(conta.getUuid());
     }
 
-    @PreAuthorize("hasAuthority(#uuid.toString())")
+    @PreAuthorize("hasAuthority(#uuid)")
     @ApiOperation("Consulta paginada dos ultimos lancamentos")
     @GetMapping(value = "/{uuid}/operacao", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getOperacoes(
@@ -149,7 +149,7 @@ public class ContaController {
         return ResponseEntity.ok(map);
     }
 
-    @PreAuthorize("hasAuthority(#uuid.toString())")
+    @PreAuthorize("hasAuthority(#uuid)")
     @ApiOperation("Consulta paginada dos extrato")
     @GetMapping(value = "/{uuid}/extrato", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<ConsultaExtratoDTO>> getContas(
