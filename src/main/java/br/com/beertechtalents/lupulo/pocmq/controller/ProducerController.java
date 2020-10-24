@@ -24,6 +24,7 @@ public class ProducerController {
 
     ProducerService producerService;
 
+    @PreAuthorize("hasAuthority(#novaOperacaoJms.conta.toString())")
     @ApiOperation("Novo Saque")
     @PostMapping(value = "/operacao:saque", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> postOperacao(@RequestBody NovaOperacaoJms novaOperacaoJms) {
@@ -41,6 +42,7 @@ public class ProducerController {
         return ResponseEntity.accepted().build();
     }
 
+    @PreAuthorize("hasAuthority(#transferenciaDTO.origem.toString())")
     @ApiOperation("Criar nova transferencia")
     @PostMapping(value = "/transferencia", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> postTransferencia(@RequestBody NovaTransferenciaDTO transferenciaDTO) {
