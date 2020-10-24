@@ -28,6 +28,10 @@ public class Operacao implements Serializable {
     @Enumerated(EnumType.STRING)
     private DescricaoOperacao descricaoOperacao;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
+
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal valor;
 
@@ -52,6 +56,13 @@ public class Operacao implements Serializable {
         SAQUE,
         TRANSFERENCIA_ORIGEM,
         TRANSFERENCIA_DESTINO,
+    }
+
+    public enum Categoria {
+        ALIMENTACAO,
+        SAUDE,
+        TRANSPORTE,
+        ENTRETENIMENTO,
     }
 
 }
