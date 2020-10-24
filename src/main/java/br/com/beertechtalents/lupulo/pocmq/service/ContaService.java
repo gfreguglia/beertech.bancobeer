@@ -11,10 +11,8 @@ import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepositor
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -62,13 +60,17 @@ public class ContaService {
         return contaRepository.findByCnpj(cnpj);
     }
 
+    @Transactional
     public void sendRequestTrocarSenha(String email) {
 
         Optional<Conta> optionalConta = findByEmail(email);
 
         if (optionalConta.isPresent()) {
             Conta conta = optionalConta.get();
+
             TokenTrocarSenha tokenResetarSenha = new TokenTrocarSenha(conta);
+
+            tokenResetarSenhaRepository.invalidarTokens(TokenTrocarSenha.getOldestValidTimestamp());
 
             tokenResetarSenhaRepository.save(tokenResetarSenha);
 

@@ -2,14 +2,11 @@ package br.com.beertechtalents.lupulo.pocmq.service;
 
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OutboxEvent;
-import br.com.beertechtalents.lupulo.pocmq.events.template.NotifyRequestResetPassword;
+import br.com.beertechtalents.lupulo.pocmq.exception.TokenInvalidException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.TokenTrocarSenha;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
 import br.com.beertechtalents.lupulo.pocmq.repository.TokenResetarSenhaRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,10 +14,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -49,6 +44,9 @@ class ContaServiceTest {
 
     @Mock
     EventPublisher eventPublisher;
+
+    @Mock
+    TokenTrocarSenha tokenTrocarSenhaMock;
 
 
     Conta conta1 = new Conta(1l, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
@@ -145,8 +143,7 @@ class ContaServiceTest {
         try {
             contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -162,8 +159,7 @@ class ContaServiceTest {
         try {
             contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -179,8 +175,7 @@ class ContaServiceTest {
         try {
             contaService.getContabyTokenTrocarSenha(UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -214,8 +209,7 @@ class ContaServiceTest {
         try {
             contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -230,8 +224,7 @@ class ContaServiceTest {
         try {
             contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -242,8 +235,7 @@ class ContaServiceTest {
         try {
             contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
@@ -262,8 +254,7 @@ class ContaServiceTest {
         try {
             contaService.trocarSenha(conta1.getUuid(), "nova senha", UUID.randomUUID());
             fail("Erro na validacao de token");
-        } catch (HttpClientErrorException e) {
-            assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        } catch (TokenInvalidException e) {
         }
     }
 
