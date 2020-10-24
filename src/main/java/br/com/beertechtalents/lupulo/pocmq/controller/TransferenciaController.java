@@ -28,5 +28,6 @@ public class TransferenciaController {
     public ResponseEntity<Void> novaTransferencia(@RequestBody NovaTransferenciaDTO dto) {
         transferenciaService.transferir(dto.getOrigem(), dto.getDestino(), dto.getValor());
         return ResponseEntity.noContent().build();
+
     }
 }
