@@ -1,4 +1,4 @@
-package br.com.beertechtalents.lupulo.pocmq.config.jms.template;
+package br.com.beertechtalents.lupulo.pocmq.events.template;
 
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
 

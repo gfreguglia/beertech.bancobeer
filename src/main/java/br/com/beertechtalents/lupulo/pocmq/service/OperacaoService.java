@@ -1,6 +1,7 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
-import br.com.beertechtalents.lupulo.pocmq.config.jms.template.NotifyDeposit;
+import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
+import br.com.beertechtalents.lupulo.pocmq.events.OperationEvents;
 import br.com.beertechtalents.lupulo.pocmq.exception.BusinessException;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -26,7 +28,9 @@ public class OperacaoService {
     final RabbitTemplate rabbitTemplate;
     final ContaRepository contaRepository;
     final ContaService contaService;
+    final EventPublisher eventPublisher;
 
+    @Transactional
     public void salvarOperacao(Operacao operacao) {
         Conta conta = contaRepository.findByUuid(operacao.getConta().getUuid()).get();
         switch (operacao.getTipo()) {
@@ -46,9 +50,10 @@ public class OperacaoService {
 
     }
 
-    private void salvarDeposito(Operacao operacao) {
+    @Transactional
+    public void salvarDeposito(Operacao operacao) {
         operacaoRepository.save(operacao);
-        rabbitTemplate.convertAndSend("send-email", new NotifyDeposit(operacao));
+        eventPublisher.fire(OperationEvents.createDepositEvent(operacao));
     }
 
     private void salvarSaque(Operacao operacao) {

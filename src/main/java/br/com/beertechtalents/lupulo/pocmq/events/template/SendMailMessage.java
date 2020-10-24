@@ -1,11 +1,11 @@
-package br.com.beertechtalents.lupulo.pocmq.config.jms.template;
+package br.com.beertechtalents.lupulo.pocmq.events.template;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SendMailMessage {
+public abstract class SendMailMessage {
     String email;
     String subject;
     String text;
