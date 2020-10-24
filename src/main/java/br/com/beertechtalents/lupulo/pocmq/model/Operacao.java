@@ -35,6 +35,9 @@ public class Operacao implements Serializable {
     @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal valor;
 
+    @Column(nullable = false)
+    private BigDecimal saldoAtual;
+
     @ManyToOne
     @JoinColumn(
             name = "conta_uuid",

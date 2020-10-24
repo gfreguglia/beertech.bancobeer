@@ -7,6 +7,6 @@ public class BusinessException extends RuntimeException {
     }
 
     public static BusinessException insufficientFund(){
-     return  new BusinessException("Insufficient funds");
+     return  new BusinessException("Saldo Insuficiente");
  }
 }

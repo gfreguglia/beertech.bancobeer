@@ -19,4 +19,5 @@ public class ConsultaExtratoDTO {
     final BigDecimal valor;
     final String categoria;
     final Timestamp timestamp;
+    final BigDecimal saldoAtual;
 }
