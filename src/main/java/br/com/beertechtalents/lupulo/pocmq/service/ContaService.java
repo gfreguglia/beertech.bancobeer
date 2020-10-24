@@ -35,12 +35,6 @@ public class ContaService {
         return contaRepository.findAll(PageRequest.of(page, size));
     }
 
-    public Conta novaConta(Conta conta) {
-        String encode = passwordEncoder.encode(conta.getSenha());
-        conta.setSenha(encode);
-        return contaRepository.save(conta);
-    }
-
     public Optional<Conta> getConta(UUID uuid) {
         return contaRepository.findByUuid(uuid);
     }
@@ -58,6 +52,10 @@ public class ContaService {
 
     public Optional<Conta> findByCnpj(String cnpj) {
         return contaRepository.findByCnpj(cnpj);
+    }
+
+    public Conta salvar(Conta conta) {
+        return contaRepository.save(conta);
     }
 
     @Transactional
@@ -121,5 +119,4 @@ public class ContaService {
 
         tokenResetarSenhaRepository.save(token);
     }
-
 }

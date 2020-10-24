@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @AllArgsConstructor
 @Getter
@@ -17,4 +18,5 @@ public class ConsultaExtratoDTO {
     final Operacao.DescricaoOperacao descricaoOperacao;
     final BigDecimal valor;
     final String categoria;
+    final Timestamp timestamp;
 }

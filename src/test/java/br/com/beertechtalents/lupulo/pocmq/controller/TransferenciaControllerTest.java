@@ -48,14 +48,14 @@ class TransferenciaControllerTest {
 
         Operacao operacao = new Operacao();
         conta1.setNome("CONTA");
-        conta1 = contaService.novaConta(conta1);
+        conta1 = contaService.salvar(conta1);
         operacao.setConta(conta1);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);
         operacao.setValor(BigDecimal.valueOf(100));
         operacaoService.salvarOperacao(operacao);
 
         conta2.setNome("CONTA");
-        conta2 = contaService.novaConta(conta2);
+        conta2 = contaService.salvar(conta2);
         operacao = new Operacao();
         operacao.setConta(conta2);
         operacao.setTipo(Operacao.TipoTransacao.DEPOSITO);

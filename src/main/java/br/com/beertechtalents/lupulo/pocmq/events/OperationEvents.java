@@ -12,6 +12,6 @@ public abstract class OperationEvents {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         JsonNode jsonNode = mapper.convertValue(notifyDeposit, JsonNode.class);
-        return new OutboxEvent(operacao.getId(), "MAIL", jsonNode);
+        return new OutboxEvent(operacao.getId(), NotifyDeposit.class, jsonNode);
     }
 }
