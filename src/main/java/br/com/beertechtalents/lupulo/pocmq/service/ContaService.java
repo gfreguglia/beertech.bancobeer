@@ -71,7 +71,7 @@ public class ContaService {
 
             TokenTrocarSenha tokenResetarSenha = new TokenTrocarSenha(conta);
 
-            tokenResetarSenhaRepository.invalidarTokens(TokenTrocarSenha.getOldestValidTimestamp(), conta.getUuid());
+            tokenResetarSenhaRepository.invalidarTokens(TokenTrocarSenha.getOldestValidTimestamp());
 
             tokenResetarSenhaRepository.save(tokenResetarSenha);
 

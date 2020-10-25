@@ -14,7 +14,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,8 +61,8 @@ class OperacaoServiceTest {
     @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
     void getExtrato() {
         salvarOperacao();
-        LocalDate init = conta.getCriadoEm().toLocalDateTime().toLocalDate();
-        LocalDate end = LocalDate.now();
+        Timestamp init = conta.getCriadoEm();
+        Timestamp end = new Timestamp(System.currentTimeMillis());
 
         Page<Operacao> pageOperacao = operacaoService.getPageExtrato(conta.getUuid(), init, end, 0, 10);
         assertThat(pageOperacao.getContent().get(0).getTipo()).isEqualTo(Operacao.TipoTransacao.DEPOSITO);

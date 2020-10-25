@@ -16,6 +16,6 @@ public interface TokenResetarSenhaRepository extends JpaRepository<TokenTrocarSe
     Optional<TokenTrocarSenha> findByUuid(UUID uuid);
 
     @Modifying
-    @Query("update TokenTrocarSenha token set token.invalido = true where token.expiraEm > ?1 and token.conta.uuid = ?2")
-    void invalidarTokens (Timestamp timestamp, UUID contaUuid);
+    @Query("update TokenTrocarSenha token set token.invalido = true where token.expiraEm > ?1")
+    void invalidarTokens (Timestamp timestamp);
 }

@@ -87,7 +87,7 @@ class ContaServiceTest {
 
     @Test
     void computeSaldo() {
-        assertThat(contaService.computeSaldo(conta1)).isEqualTo(BigDecimal.ZERO);
+        assertThat(contaService.computeSaldo(conta1)).isEqualTo(BigDecimal.valueOf(0.0));
     }
 
 
