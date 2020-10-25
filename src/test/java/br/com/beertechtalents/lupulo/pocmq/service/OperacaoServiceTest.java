@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import br.com.beertechtalents.lupulo.pocmq.Utils;
 import br.com.beertechtalents.lupulo.pocmq.controller.exception.BusinessValidationException;
 import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
 import br.com.beertechtalents.lupulo.pocmq.events.OutboxEvent;
@@ -24,10 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +49,7 @@ class OperacaoServiceTest {
 
   @Test
   void salvarOperacaoDeposito() {
-    Operacao op = criarOperacaoDefault();
+    Operacao op = Utils.criarOperacaoDefault();
     when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
     when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.TEN);
     operacaoService.salvarOperacao(op);
@@ -61,7 +59,7 @@ class OperacaoServiceTest {
 
   @Test
   void salvarOperacaoSaque() {
-    Operacao op = criarOperacaoDefault();
+    Operacao op = Utils.criarOperacaoDefault();
     op.setTipo(TipoTransacao.SAQUE);
     when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
     when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.TEN);
@@ -72,7 +70,7 @@ class OperacaoServiceTest {
 
   @Test
   void salvarOperacaoSaqueComSaldoInsuficiente() {
-    Operacao op = criarOperacaoDefault();
+    Operacao op = Utils.criarOperacaoDefault();
     op.setTipo(TipoTransacao.SAQUE);
     when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
     when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.ONE);
@@ -84,7 +82,7 @@ class OperacaoServiceTest {
 
   @Test
   void salvarOperacaoSaqueComOperaçãoInvalida() {
-    Operacao op = criarOperacaoDefault();
+    Operacao op = Utils.criarOperacaoDefault();
     op.setTipo(TipoTransacao.SAQUE);
     op.setTipo(null);
     when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
@@ -127,23 +125,6 @@ class OperacaoServiceTest {
   }
 
 
-  private Operacao criarOperacaoDefault() {
-    Operacao op = new Operacao();
-    op.setValor(BigDecimal.TEN);
-    op.setTipo(Operacao.TipoTransacao.DEPOSITO);
-    op.setConta(criarConta());
-    return op;
-  }
-
-  private Conta criarConta() {
-    Conta conta = new Conta();
-    conta.setNome("CONTA");
-    conta.setEmail("conta@email.com");
-    conta.setSenha("senha");
-    conta.setCnpj("12345678901234");
-    conta.setCriadoEm(Timestamp.valueOf(LocalDateTime.now()));
-    return conta;
-  }
 
 
 

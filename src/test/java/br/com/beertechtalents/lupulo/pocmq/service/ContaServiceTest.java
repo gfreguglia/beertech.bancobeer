@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -28,6 +30,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ContaServiceTest {
@@ -54,10 +59,16 @@ class ContaServiceTest {
     Conta conta1 = new Conta(1L, UUID.randomUUID(), "CONTA", "email@mail.com", "12345678901234",
             "wdf245l*iuga", new Timestamp(100000), new ArrayList<>());
 
-    //@Test
+    @Test
     void getPageConta() {
-        Page<Conta> pageConta = contaService.getPageConta(0, 10);
-        assertThat(pageConta.getContent().get(0).getNome()).isEqualTo("CONTA");
+        contaService.getPageConta(0, 10);
+        verify(contaRepository, times(1)).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void findByCnpj() {
+        contaService.findByCnpj("cnpj");
+        verify(contaRepository, times(1)).findByCnpj(any(String.class));
     }
 
     @Test
