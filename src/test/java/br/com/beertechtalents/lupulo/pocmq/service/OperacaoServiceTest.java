@@ -1,73 +1,150 @@
 package br.com.beertechtalents.lupulo.pocmq.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import br.com.beertechtalents.lupulo.pocmq.controller.exception.BusinessValidationException;
+import br.com.beertechtalents.lupulo.pocmq.events.EventPublisher;
+import br.com.beertechtalents.lupulo.pocmq.events.OutboxEvent;
 import br.com.beertechtalents.lupulo.pocmq.model.Conta;
 import br.com.beertechtalents.lupulo.pocmq.model.Operacao;
+import br.com.beertechtalents.lupulo.pocmq.model.Operacao.TipoTransacao;
 import br.com.beertechtalents.lupulo.pocmq.repository.ContaRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.security.test.context.support.WithMockUser;
-
+import br.com.beertechtalents.lupulo.pocmq.repository.OperacaoRepository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class OperacaoServiceTest {
 
-    @Autowired
-    ContaRepository contaRepository;
+  @InjectMocks
+  private OperacaoService operacaoService;
 
-    @Autowired
-    OperacaoService operacaoService;
+  @Mock
+  private ContaRepository contaRepository;
 
+  @Mock
+  private ContaService contaService;
+
+  @Mock
+  private EventPublisher eventPublisher;
+
+  @Mock
+  private OperacaoRepository operacaoRepository;
+
+
+  @Test
+  void salvarOperacaoDeposito() {
+    Operacao op = criarOperacaoDefault();
+    when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
+    when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.TEN);
+    operacaoService.salvarOperacao(op);
+    verify(operacaoRepository, times(1)).save(any(Operacao.class));
+    verify(eventPublisher, times(1)).fire(any(OutboxEvent.class));
+  }
+
+  @Test
+  void salvarOperacaoSaque() {
+    Operacao op = criarOperacaoDefault();
+    op.setTipo(TipoTransacao.SAQUE);
+    when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
+    when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.TEN);
+    operacaoService.salvarOperacao(op);
+    verify(operacaoRepository, times(1)).save(any(Operacao.class));
+    verify(eventPublisher, times(0)).fire(any(OutboxEvent.class));
+  }
+
+  @Test
+  void salvarOperacaoSaqueComSaldoInsuficiente() {
+    Operacao op = criarOperacaoDefault();
+    op.setTipo(TipoTransacao.SAQUE);
+    when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
+    when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.ONE);
+
+    assertThrows(BusinessValidationException.class, () -> {
+      operacaoService.salvarOperacao(op);
+    });
+  }
+
+  @Test
+  void salvarOperacaoSaqueComOperaçãoInvalida() {
+    Operacao op = criarOperacaoDefault();
+    op.setTipo(TipoTransacao.SAQUE);
+    op.setTipo(null);
+    when(contaRepository.findByUuid(any(UUID.class))).thenReturn(Optional.of(op.getConta()));
+    when(contaService.computeSaldo(any(Conta.class))).thenReturn(BigDecimal.ONE);
+
+    assertThrows(BusinessValidationException.class, () -> {
+      operacaoService.salvarOperacao(op);
+    });
+  }
+
+  @Test
+  void getPageOperacao() {
+    operacaoService.getPageOperacao(UUID.randomUUID(), 1, 1);
+    verify(operacaoRepository, times(1)).findByContaUuidOrderByDatahoraDesc(any(UUID.class), any(Pageable.class));
+  }
+
+  @Test
+  void getPageExtrato() {
+    LocalDate date = LocalDate.now();
+    UUID uuid = UUID.randomUUID();
+    operacaoService.getPageExtrato(uuid, date, date.plusDays(3), 1, 1);
+    verify(operacaoRepository, times(1)).findByContaUuidAndDatahoraBetweenOrderByDatahoraDesc(any(UUID.class), any(Timestamp.class), any(Timestamp.class),any(Pageable.class));
+  }
+
+  @Test
+  void getPageExtrato_com_DataInicio_DataFim_nulas() {
+    UUID uuid = UUID.randomUUID();
+    operacaoService.getPageExtrato(uuid, null, null, 1, 1);
+    verify(operacaoRepository, times(1)).findByContaUuidAndDatahoraBetweenOrderByDatahoraDesc(any(UUID.class), any(Timestamp.class), any(Timestamp.class),any(Pageable.class));
+  }
+
+  @Test
+  void getPageExtrato_DataInicio_maior_DataFim() {
+    LocalDate date = LocalDate.now();
+    UUID uuid = UUID.randomUUID();
+    assertThrows(BusinessValidationException.class, () -> {
+      operacaoService.getPageExtrato(uuid, date.plusDays(3), date, 1, 1);
+    });
+    verify(operacaoRepository, times(0)).findByContaUuidAndDatahoraBetweenOrderByDatahoraDesc(any(UUID.class), any(Timestamp.class), any(Timestamp.class),any(Pageable.class));
+  }
+
+
+  private Operacao criarOperacaoDefault() {
+    Operacao op = new Operacao();
+    op.setValor(BigDecimal.TEN);
+    op.setTipo(Operacao.TipoTransacao.DEPOSITO);
+    op.setConta(criarConta());
+    return op;
+  }
+
+  private Conta criarConta() {
     Conta conta = new Conta();
+    conta.setNome("CONTA");
+    conta.setEmail("conta@email.com");
+    conta.setSenha("senha");
+    conta.setCnpj("12345678901234");
+    conta.setCriadoEm(Timestamp.valueOf(LocalDateTime.now()));
+    return conta;
+  }
 
-    @BeforeAll
-    void setUp() {
-        conta.setNome("CONTA");
-        conta.setEmail("conta@email.com");
-        conta.setSenha("senha");
-        conta.setCnpj("12345678901234");
-        conta = contaRepository.save(conta);
-    }
 
-    @Test
-    @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
-    void salvarOperacao() {
-        Operacao op = new Operacao();
-        op.setValor(BigDecimal.valueOf(10.0));
-        op.setTipo(Operacao.TipoTransacao.DEPOSITO);
-        op.setConta(conta);
-        Assertions.assertDoesNotThrow(() -> operacaoService.salvarOperacao(op));
-    }
 
-    @Test
-    @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
-    void getOperacao() {
-        salvarOperacao();
-
-        Page<Operacao> pageOperacao = operacaoService.getPageOperacao(conta.getUuid(), 0, 10);
-        assertThat(pageOperacao.getContent().get(0).getTipo()).isEqualTo(Operacao.TipoTransacao.DEPOSITO);
-    }
-
-    @Test
-    @WithMockUser(username = "conta@email.com", password = "senha", authorities = "ADMIN")
-    void getExtrato() {
-        salvarOperacao();
-        Timestamp init = conta.getCriadoEm();
-        Timestamp end = new Timestamp(System.currentTimeMillis());
-
-        Page<Operacao> pageOperacao = operacaoService.getPageExtrato(conta.getUuid(), init, end, 0, 10);
-        assertThat(pageOperacao.getContent().get(0).getTipo()).isEqualTo(Operacao.TipoTransacao.DEPOSITO);
-
-        Page<Operacao> pageOperacao1 = operacaoService.getPageExtrato(conta.getUuid(), init, init, 0, 10);
-        assertThat(pageOperacao1.getContent().isEmpty()).isTrue();
-    }
 }
