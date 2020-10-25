@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class DadosUsuarioSessao extends User {
     final String email;
     final String nome;
