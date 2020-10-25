@@ -1,6 +1,6 @@
 package br.com.beertechtalents.lupulo.pocmq.events;
 
-import br.com.beertechtalents.lupulo.pocmq.events.template.NotifyDeposit;
+import br.com.beertechtalents.lupulo.pocmq.events.template.SendMailMessage;
 import br.com.beertechtalents.lupulo.pocmq.model.Outbox;
 import br.com.beertechtalents.lupulo.pocmq.repository.OutboxRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class OutboxPolling {
     public void pendingOutbox() {
         Streamable<Outbox> outboxes = repository.findTop10ByOrderByCreatedOnAsc();
         outboxes.forEach(outbox -> {
-            if (NotifyDeposit.class.equals(outbox.getEventType())) {
+            if (SendMailMessage.class.isAssignableFrom(outbox.getEventType())) {
                 try {
                     template.send("send-email",
                             MessageBuilder
