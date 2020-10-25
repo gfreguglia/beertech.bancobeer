@@ -4,9 +4,13 @@
 ## Links importantes:
 * Yoda Coins (Front end): https://beertech-lupulo-yoda.herokuapp.com/
 * Lúpulo Contas (Back end): https://beertech-lupulo-conta.herokuapp.com/ 
+* Notificação: https://beertech-lupulo-notification.herokuapp.com/
+* API DOC (Swagger): https://beertech-lupulo-conta.herokuapp.com/swagger-ui.html
+
 * Stack técnico / diagrama de fluxo: https://miro.com/app/board/o9J_khBO-ws=/
 * Alterações propostas: https://docs.google.com/document/d/1DgpQnl18hYJxOg_SYzeUklbYJgSyRseuH7N3Zr8ujaE/edit
 * ***Banco de dados:***
+
 * Source Backend: https://github.com/gfreguglia/beertech.bancobeer
 * Source Frontend: https://github.com/gss-patricia/yoda-coins-beertech
 
