@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestChangePasswordEvents {
 
-    @Value("${change-password.path}")
+    @Value("${change-password.path:http://localhost:3000/trocar-senha/}")
     private String path;
 
     public OutboxEvent createRequestChangePasswordEvents(TokenTrocarSenha token) {
