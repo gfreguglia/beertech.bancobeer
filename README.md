@@ -42,17 +42,21 @@
 * Autenticação: POST https://beertech-lupulo-conta.herokuapp.com/authenticate
 
 ~~_____________________________~~
-# Instruções para subir o ambiente (necessita atualizar):
-~~API http://127.0.0.1:8080~~
+# Instruções para subir o ambiente:
 
-~~RabbitMQ http://127.0.0.1:15672~~
+API base URL: http://127.0.0.1:8080/
 
-~~## Para subir o ambiente completo:~~
-~~Abra um terminal na raiz do projeto e execute~~
+## Para subir o ambiente completo:
+Abra um terminal na raiz do projeto e execute:
 
-~~./gradlew build docker~~
+`./gradlew build docker`
 
-~~docker-compose up -d~~
+`docker-compose up -d`
 
-~~## Para subir o ambiente desenvolvimento:~~
-~~docker-compose up -d rabbitmq~~
+## Para subir o ambiente desenvolvimento:
+`docker-compose up -d rabbitmq`
+
+## Notificações:
+Para usar o serviço de notificações por e-mail, é necessário que o Notification Service customizado esteja rodando.
+Este serviço pode ser encontrado em: https://github.com/rodrigosiqueiradev/beertech.bancobeer.notification
+Caso não seja encontrado, o sistema funciona normalmente, porém as mensagens não serão enviadas por e-mail
