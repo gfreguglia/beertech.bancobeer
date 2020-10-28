@@ -1,6 +1,5 @@
 package br.com.beertechtalents.lupulo.pocmq.bdd.cucumber;
 
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.json.JSONObject;
@@ -21,7 +20,7 @@ public class CreateAccountStepDefs {
 
     private static String contaUuid;
 
-    @When("client makes POST to \\/conta")
+    @When("client sends request to create account")
     public void clientMakesPOSTToConta() throws Exception {
         JSONObject object = new JSONObject();
         object.put("nome", "Mock");
@@ -36,7 +35,7 @@ public class CreateAccountStepDefs {
         contaUuid = mvcResult.getResponse().getContentAsString().replace("\"", "");
     }
 
-    @When("client makes PATCH to \\/conta")
+    @When("client sends request with new password")
     public void clientMakesPATCHToConta() throws Exception {
         JSONObject object = new JSONObject();
         object.put("password", "321");

@@ -10,6 +10,7 @@ import io.cucumber.java.en.When;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -25,6 +26,7 @@ public class MakeDepositStepDefs {
     MockMvc mvc;
     private MvcResult mvcResult;
     private ObjectMapper objectMapper = new ObjectMapper();
+    PasswordEncoder passwordEncoder;
 
     private static String contaUuid;
     private static String jwtToken;
@@ -32,7 +34,7 @@ public class MakeDepositStepDefs {
     private static final String contaSenha = "123";
     private static BigDecimal currentSaldo;
 
-    @When("client makes POST to \\/conta")
+    @When("client creates an account")
     public void clientMakesPOSTToConta() throws Exception {
         JSONObject object = new JSONObject();
         object.put("nome", "MockDeposit");
@@ -47,11 +49,11 @@ public class MakeDepositStepDefs {
         contaUuid = mvcResult.getResponse().getContentAsString().replace("\"", "");
     }
 
-    @When("client makes POST to \\/authenticate")
+    @When("client authenticates")
     public void clientMakesPOSTToAuthenticate() throws Exception {
         JSONObject object = new JSONObject();
         object.put("username", contaEmail);
-        object.put("password", contaSenha);
+        object.put("password", passwordEncoder.encode(contaSenha));
 
         mvcResult = mvc.perform(post("/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +69,7 @@ public class MakeDepositStepDefs {
         System.out.format("Current token is %s", jwtToken);
     }
 
-    @When("client sends {int} deposit POST to \\/operacao")
+    @When("client makes deposit of {int} moneys into his account")
     public void clientSendsDepositPOSTToOperacao(int arg0) throws Exception {
         JSONObject object = new JSONObject();
         object.put("conta", contaUuid);
@@ -82,7 +84,7 @@ public class MakeDepositStepDefs {
 
     }
 
-    @When("client sends GET to \\/conta\\/uuid\\/saldo")
+    @When("client views his balance")
     public void clientSendsGETToContaUuidSaldo() throws Exception {
         String saldoURL = String.format("/conta/%s/saldo", contaUuid);
         mvcResult = mvc.perform(get(saldoURL)
