@@ -13,6 +13,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
 }
 
 repositories {
@@ -50,6 +54,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
 
+    testImplementation 'io.cucumber:cucumber-java:6.8.1'
+    testImplementation 'io.cucumber:cucumber-junit:6.8.1'
+    testImplementation 'io.cucumber:cucumber-spring:6.8.1'
 }
 
 test {
@@ -63,4 +70,14 @@ docker {
     dockerfile file('Dockerfile')
     copySpec.from('build').into('build')
     pull true
+}
+
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+        }
+    }
 }
