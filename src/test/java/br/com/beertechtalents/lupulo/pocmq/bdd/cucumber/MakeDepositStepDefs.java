@@ -10,7 +10,6 @@ import io.cucumber.java.en.When;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -26,7 +25,6 @@ public class MakeDepositStepDefs {
     MockMvc mvc;
     private MvcResult mvcResult;
     private ObjectMapper objectMapper = new ObjectMapper();
-    PasswordEncoder passwordEncoder;
 
     private static String contaUuid;
     private static String jwtToken;
@@ -53,7 +51,7 @@ public class MakeDepositStepDefs {
     public void clientMakesPOSTToAuthenticate() throws Exception {
         JSONObject object = new JSONObject();
         object.put("username", contaEmail);
-        object.put("password", passwordEncoder.encode(contaSenha));
+        object.put("password", contaSenha);
 
         mvcResult = mvc.perform(post("/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
